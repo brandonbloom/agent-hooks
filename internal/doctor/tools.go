@@ -35,23 +35,23 @@ var DefaultTools = []ToolCheck{
 
 func RunToolChecks(verbose bool) []CheckResult {
 	var results []CheckResult
-	
+
 	for _, tool := range DefaultTools {
 		result := checkTool(tool, verbose)
-		
+
 		if !verbose && result.Status == CheckPassed {
 			continue
 		}
-		
+
 		results = append(results, result)
 	}
-	
+
 	return results
 }
 
 func checkTool(tool ToolCheck, verbose bool) CheckResult {
 	result := CheckResult{Name: tool.Name}
-	
+
 	if !isCommandAvailable(tool.Command) {
 		result.Status = CheckFailed
 		if tool.Required {
@@ -62,7 +62,7 @@ func checkTool(tool ToolCheck, verbose bool) CheckResult {
 		}
 		return result
 	}
-	
+
 	if verbose {
 		version := getToolVersion(tool.Command)
 		if version != "" {
@@ -71,7 +71,7 @@ func checkTool(tool ToolCheck, verbose bool) CheckResult {
 			result.Message = fmt.Sprintf("%s is installed", tool.Command)
 		}
 	}
-	
+
 	if tool.Validator != nil {
 		if err := tool.Validator(); err != nil {
 			result.Status = CheckWarning
@@ -79,7 +79,7 @@ func checkTool(tool ToolCheck, verbose bool) CheckResult {
 			return result
 		}
 	}
-	
+
 	result.Status = CheckPassed
 	return result
 }
@@ -95,20 +95,20 @@ func getToolVersion(command string) string {
 		"go":          {"version"},
 		"agent-hooks": {"--version"},
 	}
-	
+
 	args, exists := versionArgs[command]
 	if !exists {
 		return ""
 	}
-	
+
 	cmd := exec.Command(command, args...)
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
 	}
-	
+
 	version := strings.TrimSpace(string(output))
-	
+
 	switch command {
 	case "git":
 		if strings.HasPrefix(version, "git version ") {
@@ -122,6 +122,6 @@ func getToolVersion(command string) string {
 			}
 		}
 	}
-	
+
 	return version
 }
