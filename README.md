@@ -25,6 +25,14 @@ agent-hooks format              # Format changed files only
 agent-hooks format --all-files  # Format all tracked files
 ```
 
+### `doctor`
+Checks development environment and Claude Code setup. Silent by default, shows all checks with `--verbose`.
+
+```bash
+agent-hooks doctor              # Only show problems
+agent-hooks doctor --verbose    # Show all checks
+```
+
 ## Claude Code Hooks
 
 Automatically format code after file modifications by adding this to `~/.claude/settings.json`:

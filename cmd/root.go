@@ -25,4 +25,5 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(whichVcsCmd)
 	rootCmd.AddCommand(formatCmd)
+	rootCmd.AddCommand(doctorCmd)
 }

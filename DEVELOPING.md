@@ -21,14 +21,18 @@ agent-hooks/
 ├── cmd/
 │   ├── root.go            # Root command setup
 │   ├── which_vcs.go       # VCS detection subcommand
-│   └── format.go          # Format subcommand
+│   ├── format.go          # Format subcommand
+│   └── doctor.go          # Environment diagnostics subcommand
 ├── internal/
 │   ├── vcs/
 │   │   └── detector.go    # VCS detection logic
 │   ├── git/
 │   │   └── status.go      # Git operations
-│   └── format/
-│       └── formatter.go   # Code formatting logic
+│   ├── format/
+│   │   └── formatter.go   # Code formatting logic
+│   └── doctor/
+│       ├── tools.go       # Development tool checks
+│       └── claude.go      # Claude Code setup validation
 ├── go.mod                 # Go module
 ├── go.sum                 # Dependencies
 ├── README.md              # User documentation
@@ -69,6 +73,15 @@ The `internal/format` package provides the extensible formatting system:
 - **Result aggregation**: Collects formatted files, warnings, and errors
 - **Tool availability checking**: Verifies required tools are installed
 - **Graceful degradation**: Warns about unsupported files instead of failing
+
+### Diagnostics System
+
+The `internal/doctor` package provides environment and setup validation:
+
+- **Generalized tool checking**: Configurable list of development tools to verify
+- **Claude Code integration validation**: Comprehensive Claude settings and hook validation
+- **Silence is golden**: Only shows problems by default, verbose mode shows all checks
+- **Actionable feedback**: Specific error messages with guidance on fixing issues
 
 ## Building and Testing
 
