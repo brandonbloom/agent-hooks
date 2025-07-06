@@ -16,7 +16,7 @@ var whichVcsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		
+
 		fmt.Println(detectedVcs)
 		return nil
 	},

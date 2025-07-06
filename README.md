@@ -50,15 +50,21 @@ Currently supports:
 
 #### `format`
 
-Formats code in the current project using appropriate tools. Currently 
-requires a Git repository to operate.
+Formats code in the current project using appropriate tools. By default, only 
+formats files that have changed according to Git status. Requires a Git 
+repository to operate.
 
 ```bash
-agent-hooks format
+agent-hooks format              # Format only changed files
+agent-hooks format --all-files  # Format all tracked files
 ```
 
-**Note**: The format command is currently a placeholder and will be expanded 
-to support various formatting tools based on project detection.
+**Supported Formatters:**
+- **Go**: Uses `go fmt` for `.go` files
+
+**Philosophy**: "Silence is golden" - produces no output on success, warnings 
+to stderr for unsupported file types, and only fails on critical errors 
+(e.g., missing formatter tools).
 
 ### Help
 
@@ -110,6 +116,9 @@ before file edits:
 - **Evolution over magic**: Hard-coded knowledge of tools and practices, 
   not dynamic learning
 - **Human and AI friendly**: Designed for both manual and automated use
+- **Silence is golden**: Commands produce no output on success, only warnings 
+  and errors when needed
+- **Do no harm**: Prefer warnings over failures, only fail on critical errors
 
 ## Development
 
@@ -123,8 +132,12 @@ agent-hooks/
 │   ├── which_vcs.go       # VCS detection subcommand
 │   └── format.go          # Format subcommand
 ├── internal/
-│   └── vcs/
-│       └── detector.go    # VCS detection logic
+│   ├── vcs/
+│   │   └── detector.go    # VCS detection logic
+│   ├── git/
+│   │   └── status.go      # Git operations
+│   └── format/
+│       └── formatter.go   # Code formatting logic
 ├── go.mod                 # Go module
 ├── go.sum                 # Dependencies
 └── README.md              # This file
