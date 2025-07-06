@@ -47,8 +47,8 @@ func FormatFilesWithOptions(files []string, opts Options) *Result {
 }
 
 func formatGoFiles(files []string, result *Result, opts Options) error {
-	if !isCommandAvailable("go") {
-		return fmt.Errorf("go command not found - please install Go")
+	if !isCommandAvailable("goimports") {
+		return fmt.Errorf("goimports command not found - please install with: go install golang.org/x/tools/cmd/goimports@latest")
 	}
 
 	for _, file := range files {
@@ -57,7 +57,7 @@ func formatGoFiles(files []string, result *Result, opts Options) error {
 			continue
 		}
 
-		cmd := exec.Command("go", "fmt", file)
+		cmd := exec.Command("goimports", "-w", file)
 		if err := cmd.Run(); err != nil {
 			return fmt.Errorf("failed to format %s: %w", file, err)
 		}
