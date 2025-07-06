@@ -21,12 +21,15 @@ Please check if all local changes have been pushed and then install the latest v
    - If either condition fails, bail out with an appropriate error message
 
 2. **If git status is clean:**
-   - Run `go install .` to install the latest version globally
+   - Run `go install github.com/brandonbloom/agent-hooks@latest` to install the latest version globally
    - Verify the installation was successful by:
-     - Checking that `agent-hooks` command is available
-     - Running `agent-hooks --version` to show the installed version
-     - Showing the path where it was installed with `which agent-hooks`
+     - Checking that `agent-hooks` command is available with `which agent-hooks`
+     - Running `agent-hooks version` to show the installed version (should include git commit SHA)
+     - Confirm the version matches the latest commit SHA from this repository
 
 3. **Report the results:**
-   - Success message with version and installation path
+   - Success message showing:
+     - Installation path from `which agent-hooks`
+     - Full version string from `agent-hooks version`
+     - Confirmation that the git SHA in the version matches the current repository state
    - Or appropriate error message if anything failed
