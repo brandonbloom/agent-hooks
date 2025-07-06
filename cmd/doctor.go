@@ -17,15 +17,18 @@ var doctorCmd = &cobra.Command{
 By default, only shows problems. Use --verbose to see all checks.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var allResults []doctor.CheckResult
-		
+
 		toolResults := doctor.RunToolChecks(verbose)
 		allResults = append(allResults, toolResults...)
-		
+
+		projectResults := doctor.RunProjectChecks(verbose)
+		allResults = append(allResults, projectResults...)
+
 		claudeResults := doctor.RunClaudeChecks(verbose)
 		allResults = append(allResults, claudeResults...)
-		
+
 		hasProblems := false
-		
+
 		for _, result := range allResults {
 			switch result.Status {
 			case doctor.CheckPassed:
@@ -46,12 +49,12 @@ By default, only shows problems. Use --verbose to see all checks.`,
 				fmt.Fprintln(os.Stderr)
 			}
 		}
-		
+
 		if verbose && len(allResults) > 0 {
 			passed := 0
 			warnings := 0
 			failed := 0
-			
+
 			for _, result := range allResults {
 				switch result.Status {
 				case doctor.CheckPassed:
@@ -62,7 +65,7 @@ By default, only shows problems. Use --verbose to see all checks.`,
 					failed++
 				}
 			}
-			
+
 			fmt.Printf("\nSummary: %d passed", passed)
 			if failed > 0 {
 				fmt.Printf(", %d failed", failed)
@@ -72,11 +75,11 @@ By default, only shows problems. Use --verbose to see all checks.`,
 			}
 			fmt.Println()
 		}
-		
+
 		if hasProblems {
 			return fmt.Errorf("found issues in environment setup")
 		}
-		
+
 		return nil
 	},
 }
