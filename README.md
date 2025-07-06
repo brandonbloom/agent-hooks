@@ -2,6 +2,19 @@
 
 Zero-config convenience commands for humans and AI agents.
 
+## Why This Tool Exists
+
+AI agents like Claude are powerful but often inconsistent with development workflows—they might forget to format code, skip linting, or miss other routine tasks. This tool brings **deterministic execution** to AI-assisted development by using hooks to ensure critical steps happen reliably.
+
+### Design Principles
+
+- **Convention over configuration**: Sensible defaults that work across projects, eliminating the need for per-project config files
+- **Unix-centric**: Built around standard Unix tools and philosophy rather than being tied to specific programming languages  
+- **Get out of your way**: Works silently when successful, provides clear explanations when it fails
+- **Low false positive rate**: Like `go fmt`, opinionated enough to maintain consistency but unopinionated enough to avoid conflicts
+
+This tool was built primarily for personal use but may serve as a useful example for others tackling similar workflow automation challenges.
+
 ## Installation
 
 ```bash
