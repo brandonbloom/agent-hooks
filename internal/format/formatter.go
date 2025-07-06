@@ -12,32 +12,51 @@ type Result struct {
 	FormattedFiles []string
 	Warnings       []string
 	Errors         []string
+	SkippedFiles   []string
+}
+
+type Options struct {
+	DryRun  bool
+	Verbose bool
 }
 
 func FormatFiles(files []string) *Result {
+	return FormatFilesWithOptions(files, Options{})
+}
+
+func FormatFilesWithOptions(files []string, opts Options) *Result {
 	result := &Result{}
 
 	goFiles := filterFilesByExtension(files, ".go")
 	if len(goFiles) > 0 {
-		if err := formatGoFiles(goFiles, result); err != nil {
+		if err := formatGoFiles(goFiles, result, opts); err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("Go formatting failed: %v", err))
 		}
 	}
 
 	unsupportedFiles := filterUnsupportedFiles(files)
 	for _, file := range unsupportedFiles {
-		result.Warnings = append(result.Warnings, fmt.Sprintf("No formatter available for: %s", file))
+		if opts.Verbose {
+			result.Warnings = append(result.Warnings, fmt.Sprintf("No formatter available for: %s", file))
+		} else {
+			result.SkippedFiles = append(result.SkippedFiles, file)
+		}
 	}
 
 	return result
 }
 
-func formatGoFiles(files []string, result *Result) error {
+func formatGoFiles(files []string, result *Result, opts Options) error {
 	if !isCommandAvailable("go") {
 		return fmt.Errorf("go command not found - please install Go")
 	}
 
 	for _, file := range files {
+		if opts.DryRun {
+			result.FormattedFiles = append(result.FormattedFiles, file)
+			continue
+		}
+
 		cmd := exec.Command("go", "fmt", file)
 		if err := cmd.Run(); err != nil {
 			return fmt.Errorf("failed to format %s: %w", file, err)

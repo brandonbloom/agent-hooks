@@ -21,8 +21,11 @@ agent-hooks which-vcs
 Formats changed files (or all files with `--all-files`). Supports Go files.
 
 ```bash
-agent-hooks format              # Format changed files only
-agent-hooks format --all-files  # Format all tracked files
+agent-hooks format                    # Format changed files only
+agent-hooks format --all-files       # Format all tracked files  
+agent-hooks format --verbose         # Show what files are formatted
+agent-hooks format --dry-run         # Preview what would be formatted
+agent-hooks format --dry-run -v      # Preview with detailed output
 ```
 
 ### `doctor`

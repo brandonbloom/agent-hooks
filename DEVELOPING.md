@@ -73,6 +73,8 @@ The `internal/format` package provides the extensible formatting system:
 - **Result aggregation**: Collects formatted files, warnings, and errors
 - **Tool availability checking**: Verifies required tools are installed
 - **Graceful degradation**: Warns about unsupported files instead of failing
+- **Dry-run support**: Preview mode that shows what would be formatted without changes
+- **Verbose output**: Detailed reporting of formatting operations and skipped files
 
 ### Diagnostics System
 
