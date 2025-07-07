@@ -16,6 +16,7 @@ const (
 	Rust       Technology = "rust"
 	Ruby       Technology = "ruby"
 	Java       Technology = "java"
+	Clojure    Technology = "clojure"
 	Transcript Technology = "transcript"
 	Hurl       Technology = "hurl"
 )
@@ -49,6 +50,7 @@ var detectionRules = []DetectionRule{
 	{Technology: Rust, Files: []string{"Cargo.toml"}, Desc: "Rust project"},
 	{Technology: Ruby, Files: []string{"Gemfile"}, Desc: "Ruby project"},
 	{Technology: Java, Files: []string{"pom.xml", "build.gradle"}, Desc: "Java project"},
+	{Technology: Clojure, Files: []string{"project.clj", "deps.edn", "shadow-cljs.edn", "bb.edn"}, Desc: "Clojure project"},
 	{Technology: Transcript, Files: []string{"*.cmdt"}, Desc: "Transcript test files"},
 	{Technology: Hurl, Files: []string{"*.hurl"}, Desc: "Hurl HTTP test files"},
 }
@@ -67,6 +69,8 @@ var toolRequirements = []ToolRequirement{
 	{Technology: Ruby, Tool: "gem", Required: false, Desc: "Ruby package manager"},
 	{Technology: Java, Tool: "java", Required: true, Desc: "Java runtime"},
 	{Technology: Java, Tool: "javac", Required: true, Desc: "Java compiler"},
+	{Technology: Clojure, Tool: "clojure", Required: true, Desc: "Clojure CLI tool"},
+	{Technology: Clojure, Tool: "lein", Required: false, Desc: "Leiningen build tool"},
 	{Technology: Transcript, Tool: "transcript", Required: true, Desc: "Transcript testing tool"},
 	{Technology: Hurl, Tool: "hurl", Required: true, Desc: "Hurl HTTP testing tool"},
 }
