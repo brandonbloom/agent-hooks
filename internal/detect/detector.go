@@ -123,7 +123,8 @@ func (d *DefaultDetector) checkRule(dir string, rule DetectionRule) (bool, error
 }
 
 func containsWildcard(path string) bool {
-	return filepath.Base(path) != path && (filepath.Base(path)[0] == '*' || filepath.Base(path)[len(filepath.Base(path))-1] == '*')
+	base := filepath.Base(path)
+	return len(base) > 0 && (base[0] == '*' || base[len(base)-1] == '*')
 }
 
 func DetectInDirectory(dir string) ([]Technology, error) {
