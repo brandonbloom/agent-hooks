@@ -17,6 +17,7 @@ const (
 	Ruby       Technology = "ruby"
 	Java       Technology = "java"
 	Transcript Technology = "transcript"
+	Hurl       Technology = "hurl"
 )
 
 type DetectionRule struct {
@@ -49,6 +50,7 @@ var detectionRules = []DetectionRule{
 	{Technology: Ruby, Files: []string{"Gemfile"}, Desc: "Ruby project"},
 	{Technology: Java, Files: []string{"pom.xml", "build.gradle"}, Desc: "Java project"},
 	{Technology: Transcript, Files: []string{"*.cmdt"}, Desc: "Transcript test files"},
+	{Technology: Hurl, Files: []string{"*.hurl"}, Desc: "Hurl HTTP test files"},
 }
 
 var toolRequirements = []ToolRequirement{
@@ -66,6 +68,7 @@ var toolRequirements = []ToolRequirement{
 	{Technology: Java, Tool: "java", Required: true, Desc: "Java runtime"},
 	{Technology: Java, Tool: "javac", Required: true, Desc: "Java compiler"},
 	{Technology: Transcript, Tool: "transcript", Required: true, Desc: "Transcript testing tool"},
+	{Technology: Hurl, Tool: "hurl", Required: true, Desc: "Hurl HTTP testing tool"},
 }
 
 func NewDetector() TechDetector {
