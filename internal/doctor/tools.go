@@ -27,11 +27,13 @@ type ToolCheck struct {
 	Required  bool
 }
 
+// Default tools are sorted alphabetically to minimize merge conflicts
+// when adding new tools. Please maintain this order.
 var DefaultTools = []ToolCheck{
+	{Name: "agent-hooks", Command: "agent-hooks", Required: false},
 	{Name: "git", Command: "git", Required: true},
 	{Name: "go", Command: "go", Required: false},
 	{Name: "goimports", Command: "goimports", Required: false},
-	{Name: "agent-hooks", Command: "agent-hooks", Required: false},
 }
 
 func RunToolChecks(verbose bool) []CheckResult {
@@ -91,11 +93,13 @@ func isCommandAvailable(command string) bool {
 }
 
 func getToolVersion(command string) string {
+	// Version arguments are sorted alphabetically to minimize merge conflicts
+	// when adding new tools. Please maintain this order.
 	versionArgs := map[string][]string{
+		"agent-hooks": {"--version"},
 		"git":         {"--version"},
 		"go":          {"version"},
 		"goimports":   {"--help"},
-		"agent-hooks": {"--version"},
 	}
 
 	args, exists := versionArgs[command]

@@ -95,18 +95,20 @@ func checkProjectTool(req ToolRequirement, verbose bool) CheckResult {
 }
 
 func getProjectToolVersion(command string) string {
+	// Version arguments are sorted alphabetically to minimize merge conflicts
+	// when adding new tools. Please maintain this order.
 	versionArgs := map[string][]string{
-		"go":         {"version"},
-		"node":       {"--version"},
-		"npm":        {"--version"},
-		"python":     {"--version"},
-		"pip":        {"--version"},
 		"cargo":      {"--version"},
-		"rustc":      {"--version"},
-		"ruby":       {"--version"},
 		"gem":        {"--version"},
+		"go":         {"version"},
 		"java":       {"-version"},
 		"javac":      {"-version"},
+		"node":       {"--version"},
+		"npm":        {"--version"},
+		"pip":        {"--version"},
+		"python":     {"--version"},
+		"ruby":       {"--version"},
+		"rustc":      {"--version"},
 		"transcript": {"--version"},
 	}
 

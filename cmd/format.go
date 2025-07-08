@@ -93,7 +93,7 @@ Currently requires a Git repository and supports Go files.`,
 		}
 
 		if len(result.Errors) > 0 {
-			return fmt.Errorf(result.Errors[0])
+			return fmt.Errorf("%s", result.Errors[0])
 		}
 
 		return nil
