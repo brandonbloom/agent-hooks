@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/brandonbloom/agent-hooks/internal/detect"
+	"github.com/brandonbloom/agent-hooks/internal/vcs"
 )
 
 func RunProjectChecks(verbose bool) []CheckResult {
@@ -20,6 +21,15 @@ func RunProjectChecks(verbose bool) []CheckResult {
 			Message: fmt.Sprintf("Failed to get current directory: %v", err),
 		})
 		return results
+	}
+
+	// Get project root info once
+	var projectInfo string
+	projectRoot, err := vcs.FindProjectRoot()
+	if err != nil {
+		projectInfo = fmt.Sprintf("current directory: %s", cwd)
+	} else {
+		projectInfo = fmt.Sprintf("project root: %s", projectRoot)
 	}
 
 	detector := &detect.Detector{}
@@ -38,7 +48,7 @@ func RunProjectChecks(verbose bool) []CheckResult {
 			results = append(results, CheckResult{
 				Name:    "Project Detection",
 				Status:  CheckPassed,
-				Message: "No specific technologies detected (generic project)",
+				Message: fmt.Sprintf("No specific technologies detected (generic project) - %s", projectInfo),
 			})
 		}
 		return results
@@ -52,7 +62,7 @@ func RunProjectChecks(verbose bool) []CheckResult {
 		results = append(results, CheckResult{
 			Name:    "Project Detection",
 			Status:  CheckPassed,
-			Message: fmt.Sprintf("Detected technologies: %v", techNames),
+			Message: fmt.Sprintf("Detected technologies: %v - %s", techNames, projectInfo),
 		})
 	}
 
