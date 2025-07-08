@@ -25,7 +25,7 @@ func init() {
 }
 
 func runDetect(cmd *cobra.Command, args []string) error {
-	detector := &detect.Detector{}
+	detector := &detect.Detector{Verbose: detectVerbose}
 
 	cwd, err := os.Getwd()
 	if err != nil {
