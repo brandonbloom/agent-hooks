@@ -14,6 +14,7 @@ type DetectionRule struct {
 	Technology Technology
 	Files      []string
 	Desc       string
+	URL        string
 }
 
 type Detector struct {

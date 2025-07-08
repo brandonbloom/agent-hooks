@@ -20,9 +20,12 @@ agent-hooks/
 ├── main.go                 # Entry point
 ├── cmd/
 │   ├── root.go            # Root command setup
-│   ├── which_vcs.go       # VCS detection subcommand
+│   ├── about.go           # Technology and tool introspection subcommand
+│   ├── detect.go          # Technology detection subcommand
+│   ├── doctor.go          # Environment diagnostics subcommand
 │   ├── format.go          # Format subcommand
-│   └── doctor.go          # Environment diagnostics subcommand
+│   ├── version.go         # Version information subcommand
+│   └── which_vcs.go       # VCS detection subcommand
 ├── internal/
 │   ├── detect/
 │   │   ├── detector.go     # Main detection engine
@@ -90,16 +93,18 @@ The `internal/doctor` package provides environment and setup validation:
 - **Claude Code integration validation**: Comprehensive Claude settings and hook validation
 - **Silence is golden**: Only shows problems by default, verbose mode shows all checks
 - **Actionable feedback**: Specific error messages with guidance on fixing issues
+- **Reference URLs**: Each tool includes official documentation URL for introspection
 
 ### Technology Detection System
 
 The `internal/detect` package provides extensible technology detection:
 
 - **Technology constants** (`technologies.go`): Alphabetically sorted technology identifiers
-- **Detection rules** (`rules.go`): File patterns and descriptions for each technology  
+- **Detection rules** (`rules.go`): File patterns, descriptions, and reference URLs for each technology  
 - **VCS-aware detection**: Prioritizes git-tracked files for performance
 - **Fallback scanning**: Falls back to directory traversal when VCS unavailable
 - **Alphabetical ordering**: All technology lists maintain strict alphabetical order to minimize merge conflicts
+- **Reference URLs**: Each technology includes official documentation URL for introspection
 
 #### Key files:
 - `internal/detect/technologies.go` - Technology constant definitions
@@ -181,11 +186,13 @@ To add support for detecting a new technology:
    - Insert in alphabetical order by technology name
    - Specify file patterns that indicate the technology's presence
    - Provide descriptive text for user-facing output
+   - Include official documentation URL for reference
 
 3. **Add tool check** (optional) to `internal/doctor/tools.go`:
    - Add to `DefaultTools` slice in alphabetical order
    - Specify command name and whether it's required
    - Add version detection to `versionArgs` map if needed
+   - Include official documentation URL for reference
 
 ### Example: Adding Direnv Support
 
@@ -194,10 +201,10 @@ To add support for detecting a new technology:
 Direnv          Technology = "direnv"
 
 // In internal/detect/rules.go  
-{Technology: Direnv, Files: []string{".envrc"}, Desc: "Direnv environment configuration"},
+{Technology: Direnv, Files: []string{".envrc"}, Desc: "Direnv environment configuration", URL: "https://direnv.net"},
 
 // In internal/doctor/tools.go
-{Name: "direnv", Command: "direnv", Required: false},
+{Name: "direnv", Command: "direnv", Required: false, URL: "https://direnv.net"},
 ```
 
 ### Important Notes
@@ -227,6 +234,12 @@ Direnv          Technology = "direnv"
 1. **Tool availability**: `agent-hooks doctor` should check all configured tools
 2. **Verbose output**: `agent-hooks doctor --verbose` should show all tool versions
 3. **Missing tools**: Remove tools from PATH, verify appropriate warnings
+
+#### About Command
+1. **Technology lookup**: `agent-hooks about go` should show technology details
+2. **Tool lookup**: `agent-hooks about goimports` should show tool details
+3. **Case insensitive**: Should work with any casing (go, Go, GO)
+4. **Unknown items**: Should provide clear error for unknown technologies/tools
 
 ### Test Data Setup
 

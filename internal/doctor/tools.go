@@ -26,16 +26,17 @@ type ToolCheck struct {
 	Command   string
 	Validator func() error
 	Required  bool
+	URL       string
 }
 
 // Default tools are sorted alphabetically to minimize merge conflicts
 // when adding new tools. Please maintain this order.
 var DefaultTools = []ToolCheck{
-	{Name: "agent-hooks", Command: "agent-hooks", Required: false},
-	{Name: "direnv", Command: "direnv", Required: false, Validator: validateDirenvSetup},
-	{Name: "git", Command: "git", Required: true},
-	{Name: "go", Command: "go", Required: false},
-	{Name: "goimports", Command: "goimports", Required: false},
+	{Name: "agent-hooks", Command: "agent-hooks", Required: false, URL: "https://github.com/brandonbloom/agent-hooks"},
+	{Name: "direnv", Command: "direnv", Required: false, Validator: validateDirenvSetup, URL: "https://direnv.net"},
+	{Name: "git", Command: "git", Required: true, URL: "https://git-scm.com"},
+	{Name: "go", Command: "go", Required: false, URL: "https://golang.org"},
+	{Name: "goimports", Command: "goimports", Required: false, URL: "https://pkg.go.dev/golang.org/x/tools/cmd/goimports"},
 }
 
 func RunToolChecks(verbose bool) []CheckResult {
