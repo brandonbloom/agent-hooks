@@ -2,6 +2,7 @@ package doctor
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -31,7 +32,7 @@ type ToolCheck struct {
 // when adding new tools. Please maintain this order.
 var DefaultTools = []ToolCheck{
 	{Name: "agent-hooks", Command: "agent-hooks", Required: false},
-	{Name: "direnv", Command: "direnv", Required: false},
+	{Name: "direnv", Command: "direnv", Required: false, Validator: validateDirenvSetup},
 	{Name: "git", Command: "git", Required: true},
 	{Name: "go", Command: "go", Required: false},
 	{Name: "goimports", Command: "goimports", Required: false},
@@ -132,4 +133,32 @@ func getToolVersion(command string) string {
 	}
 
 	return version
+}
+
+func validateDirenvSetup() error {
+	// Only validate direnv setup if we're in a project that uses direnv
+	if !hasDirenvFile() {
+		return nil // No .envrc file, so no additional validation needed
+	}
+
+	// Check if direnv status command works (indicates shell integration)
+	cmd := exec.Command("direnv", "status")
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("direnv status failed - shell integration may not be setup")
+	}
+
+	status := string(output)
+
+	// Check if current directory's .envrc is allowed
+	if strings.Contains(status, "Found RC allowed false") {
+		return fmt.Errorf(".envrc file found but not allowed - run 'direnv allow' to trust it")
+	}
+
+	return nil
+}
+
+func hasDirenvFile() bool {
+	_, err := os.Stat(".envrc")
+	return err == nil
 }
