@@ -96,7 +96,6 @@ Currently requires a Git repository and supports Go files.`,
 			for _, errMsg := range result.Errors {
 				fmt.Fprintf(os.Stderr, "Error: %s\n", errMsg)
 			}
-			cmd.SilenceUsage = true
 			return fmt.Errorf("formatting failed")
 		}
 
