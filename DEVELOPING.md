@@ -24,15 +24,21 @@ agent-hooks/
 │   ├── format.go          # Format subcommand
 │   └── doctor.go          # Environment diagnostics subcommand
 ├── internal/
+│   ├── detect/
+│   │   ├── detector.go     # Main detection engine
+│   │   ├── technologies.go # Technology constants (alphabetical)
+│   │   └── rules.go        # Detection rules (alphabetical)
 │   ├── vcs/
-│   │   └── detector.go    # VCS detection logic
+│   │   └── detector.go     # VCS detection logic
 │   ├── git/
-│   │   └── status.go      # Git operations
+│   │   └── status.go       # Git operations
 │   ├── format/
-│   │   └── formatter.go   # Code formatting logic
+│   │   └── formatter.go    # Code formatting logic
 │   └── doctor/
-│       ├── tools.go       # Development tool checks
-│       └── claude.go      # Claude Code setup validation
+│       ├── tools.go        # Development tool checks (alphabetical)
+│       ├── claude.go       # Claude Code setup validation
+│       ├── requirements.go # Environment requirements
+│       └── project.go      # Project-specific checks
 ├── go.mod                 # Go module
 ├── go.sum                 # Dependencies
 ├── README.md              # User documentation
@@ -84,6 +90,21 @@ The `internal/doctor` package provides environment and setup validation:
 - **Claude Code integration validation**: Comprehensive Claude settings and hook validation
 - **Silence is golden**: Only shows problems by default, verbose mode shows all checks
 - **Actionable feedback**: Specific error messages with guidance on fixing issues
+
+### Technology Detection System
+
+The `internal/detect` package provides extensible technology detection:
+
+- **Technology constants** (`technologies.go`): Alphabetically sorted technology identifiers
+- **Detection rules** (`rules.go`): File patterns and descriptions for each technology  
+- **VCS-aware detection**: Prioritizes git-tracked files for performance
+- **Fallback scanning**: Falls back to directory traversal when VCS unavailable
+- **Alphabetical ordering**: All technology lists maintain strict alphabetical order to minimize merge conflicts
+
+#### Key files:
+- `internal/detect/technologies.go` - Technology constant definitions
+- `internal/detect/rules.go` - Detection rules mapping technologies to file patterns
+- `internal/detect/detector.go` - Main detection engine
 
 ## Building and Testing
 
@@ -148,16 +169,64 @@ var newCommand = &cobra.Command{
 - Follow the "silence is golden" principle: no output on success
 - Handle individual file failures gracefully
 
+## Adding New Technologies
+
+To add support for detecting a new technology:
+
+1. **Add technology constant** to `internal/detect/technologies.go`:
+   - Insert in alphabetical order to minimize merge conflicts
+   - Use lowercase naming convention
+
+2. **Add detection rule** to `internal/detect/rules.go`:
+   - Insert in alphabetical order by technology name
+   - Specify file patterns that indicate the technology's presence
+   - Provide descriptive text for user-facing output
+
+3. **Add tool check** (optional) to `internal/doctor/tools.go`:
+   - Add to `DefaultTools` slice in alphabetical order
+   - Specify command name and whether it's required
+   - Add version detection to `versionArgs` map if needed
+
+### Example: Adding Direnv Support
+
+```go
+// In internal/detect/technologies.go
+Direnv          Technology = "direnv"
+
+// In internal/detect/rules.go  
+{Technology: Direnv, Files: []string{".envrc"}, Desc: "Direnv environment configuration"},
+
+// In internal/doctor/tools.go
+{Name: "direnv", Command: "direnv", Required: false},
+```
+
+### Important Notes
+
+- **Alphabetical ordering is critical** - All technology collections must maintain strict alphabetical order
+- **Detection uses VCS-aware scanning** - Files must be git-tracked to be detected (fallback to directory scan when not in git repo)
+- **Test both detection and doctor commands** after adding new technologies
+
 ## Testing Approach
 
 ### Manual Testing Scenarios
 
+#### Format Command
 1. **No changed files**: `agent-hooks format` should exit silently
 2. **Changed Go files**: Should format only changed `.go` files
 3. **All files**: `agent-hooks format --all-files` should format all tracked Go files
 4. **Mixed file types**: Should format supported files and warn about unsupported
 5. **Missing tools**: Should fail with helpful error message
 6. **Non-Git repository**: Should fail with VCS error
+
+#### Detect Command  
+1. **Technology detection**: `agent-hooks detect` should identify all technologies in project
+2. **Git-tracked files**: Only git-tracked files are considered for detection
+3. **Untracked files**: Create untracked technology files, verify they're not detected until tracked
+
+#### Doctor Command
+1. **Tool availability**: `agent-hooks doctor` should check all configured tools
+2. **Verbose output**: `agent-hooks doctor --verbose` should show all tool versions
+3. **Missing tools**: Remove tools from PATH, verify appropriate warnings
 
 ### Test Data Setup
 
