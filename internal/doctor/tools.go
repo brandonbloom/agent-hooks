@@ -27,7 +27,6 @@ type ToolCheck struct {
 	Name      string
 	Command   string
 	Validator func() error
-	Required  bool
 	URL       string
 }
 
@@ -40,36 +39,36 @@ type ToolCheck struct {
 //   - Meta-tools: Have no Command field (empty string) and use only a Validator function
 //     to check for "one of" requirements (e.g., procfile-runner checks for foreman OR hivemind OR overmind)
 var AllTools = []ToolCheck{
-	{Name: "agent-hooks", Command: "agent-hooks", Required: false, URL: "https://github.com/brandonbloom/agent-hooks"},
-	{Name: "cargo", Command: "cargo", Required: false, URL: "https://doc.rust-lang.org/cargo/"},
-	{Name: "clojure", Command: "clojure", Required: false, URL: "https://clojure.org"},
-	{Name: "direnv", Command: "direnv", Required: false, Validator: validateDirenvSetup, URL: "https://direnv.net"},
-	{Name: "foreman", Command: "foreman", Required: false, URL: "https://github.com/ddollar/foreman"},
-	{Name: "gem", Command: "gem", Required: false, URL: "https://rubygems.org"},
-	{Name: "git", Command: "git", Required: true, URL: "https://git-scm.com"},
-	{Name: "go", Command: "go", Required: false, URL: "https://golang.org"},
-	{Name: "gofmt", Command: "gofmt", Required: false, URL: "https://golang.org"},
-	{Name: "goimports", Command: "goimports", Required: false, URL: "https://pkg.go.dev/golang.org/x/tools/cmd/goimports"},
-	{Name: "hivemind", Command: "hivemind", Required: false, URL: "https://github.com/DarthSim/hivemind"},
-	{Name: "hurl", Command: "hurl", Required: false, URL: "https://hurl.dev"},
-	{Name: "java", Command: "java", Required: false, URL: "https://www.oracle.com/java/"},
-	{Name: "javac", Command: "javac", Required: false, URL: "https://www.oracle.com/java/"},
-	{Name: "lein", Command: "lein", Required: false, URL: "https://leiningen.org"},
-	{Name: "ng", Command: "ng", Required: false, URL: "https://angular.io/cli"},
-	{Name: "node", Command: "node", Required: false, URL: "https://nodejs.org"},
-	{Name: "npm", Command: "npm", Required: false, URL: "https://www.npmjs.com"},
-	{Name: "overmind", Command: "overmind", Required: false, URL: "https://github.com/DarthSim/overmind"},
-	{Name: "pip", Command: "pip", Required: false, URL: "https://pip.pypa.io"},
-	{Name: "procfile-runner", Required: false, Validator: validateProcfileRunner, URL: "https://devcenter.heroku.com/articles/procfile"},
-	{Name: "python", Command: "python", Required: false, URL: "https://www.python.org"},
-	{Name: "ruby", Command: "ruby", Required: false, URL: "https://www.ruby-lang.org"},
-	{Name: "rustc", Command: "rustc", Required: false, URL: "https://www.rust-lang.org"},
-	{Name: "transcript", Command: "transcript", Required: false, URL: "https://github.com/jspahrsummers/transcript"},
+	{Name: "agent-hooks", Command: "agent-hooks", URL: "https://github.com/brandonbloom/agent-hooks"},
+	{Name: "cargo", Command: "cargo", URL: "https://doc.rust-lang.org/cargo/"},
+	{Name: "clojure", Command: "clojure", URL: "https://clojure.org"},
+	{Name: "direnv", Command: "direnv", Validator: validateDirenvSetup, URL: "https://direnv.net"},
+	{Name: "foreman", Command: "foreman", URL: "https://github.com/ddollar/foreman"},
+	{Name: "gem", Command: "gem", URL: "https://rubygems.org"},
+	{Name: "git", Command: "git", URL: "https://git-scm.com"},
+	{Name: "go", Command: "go", URL: "https://golang.org"},
+	{Name: "gofmt", Command: "gofmt", URL: "https://golang.org"},
+	{Name: "goimports", Command: "goimports", URL: "https://pkg.go.dev/golang.org/x/tools/cmd/goimports"},
+	{Name: "hivemind", Command: "hivemind", URL: "https://github.com/DarthSim/hivemind"},
+	{Name: "hurl", Command: "hurl", URL: "https://hurl.dev"},
+	{Name: "java", Command: "java", URL: "https://www.oracle.com/java/"},
+	{Name: "javac", Command: "javac", URL: "https://www.oracle.com/java/"},
+	{Name: "lein", Command: "lein", URL: "https://leiningen.org"},
+	{Name: "ng", Command: "ng", URL: "https://angular.io/cli"},
+	{Name: "node", Command: "node", URL: "https://nodejs.org"},
+	{Name: "npm", Command: "npm", URL: "https://www.npmjs.com"},
+	{Name: "overmind", Command: "overmind", URL: "https://github.com/DarthSim/overmind"},
+	{Name: "pip", Command: "pip", URL: "https://pip.pypa.io"},
+	{Name: "procfile-runner", Validator: validateProcfileRunner, URL: "https://devcenter.heroku.com/articles/procfile"},
+	{Name: "python", Command: "python", URL: "https://www.python.org"},
+	{Name: "ruby", Command: "ruby", URL: "https://www.ruby-lang.org"},
+	{Name: "rustc", Command: "rustc", URL: "https://www.rust-lang.org"},
+	{Name: "transcript", Command: "transcript", URL: "https://github.com/jspahrsummers/transcript"},
 }
 
 // DefaultTools are the core tools checked for ALL projects.
-// This is a simple list of tool names that reference entries in AllTools.
 // These tools are checked globally regardless of what technologies are detected in the project.
+// All default tools are required by definition.
 var DefaultTools = []string{
 	"agent-hooks",
 	"git",
@@ -101,7 +100,8 @@ func RunToolChecks(verbose bool) []CheckResult {
 			continue
 		}
 
-		result := checkTool(tool, verbose)
+		required := true // All default tools are required
+		result := checkTool(tool, required, verbose)
 
 		if !verbose && result.Status == CheckPassed {
 			continue
@@ -113,21 +113,11 @@ func RunToolChecks(verbose bool) []CheckResult {
 	return results
 }
 
-// checkTool validates a tool using its default Required setting.
-// This is used for global tool checks (DefaultTools).
-func checkTool(tool ToolCheck, verbose bool) CheckResult {
-	return checkToolWithRequired(tool, tool.Required, verbose)
-}
-
-// checkToolWithRequired validates a tool with a custom required flag.
-// This allows project-specific requirements to override the tool's default Required setting.
-// Used when processing ToolRequirement entries that may have different required flags than the tool definition.
-//
-// TODO: The need for this function suggests a design issue. The "required" property should
-// be a property of the association between a tool and a project/technology, not an intrinsic
-// property of the tool itself. A tool like "npm" might be required for Node.js projects but
-// optional for general development. This would eliminate the need to override the Required field.
-func checkToolWithRequired(tool ToolCheck, required bool, verbose bool) CheckResult {
+// checkTool validates a tool with the specified required flag.
+// This function implements the unified tool checking logic where the required status
+// is determined by the context (global default tools vs. project-specific requirements)
+// rather than being an intrinsic property of the tool itself.
+func checkTool(tool ToolCheck, required bool, verbose bool) CheckResult {
 	result := CheckResult{Name: tool.Name}
 
 	commandAvailable := tool.Command != "" && isCommandAvailable(tool.Command)

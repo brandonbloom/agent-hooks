@@ -48,11 +48,6 @@ Examples:
 				} else {
 					fmt.Printf("Command: (meta-tool)\n")
 				}
-				if tool.Required {
-					fmt.Printf("Required: Yes\n")
-				} else {
-					fmt.Printf("Required: No\n")
-				}
 				fmt.Printf("URL: %s\n", tool.URL)
 				return nil
 			}

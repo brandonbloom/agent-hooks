@@ -83,7 +83,7 @@ func checkProjectTool(req ToolRequirement, verbose bool) CheckResult {
 	}
 
 	// Use the unified tool checking with the requirement's required flag
-	result := checkToolWithRequired(tool, req.Required, verbose)
+	result := checkTool(tool, req.Required, verbose)
 
 	// Update the result name to include technology context
 	result.Name = fmt.Sprintf("%s (%s)", req.Tool, req.Technology)
