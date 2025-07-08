@@ -39,11 +39,15 @@ Examples:
 		}
 
 		// Then check if it's a tool
-		for _, tool := range doctor.DefaultTools {
+		for _, tool := range doctor.AllTools {
 			if strings.ToLower(tool.Name) == name {
 				fmt.Printf("Name: %s\n", tool.Name)
 				fmt.Printf("Type: Tool\n")
-				fmt.Printf("Command: %s\n", tool.Command)
+				if tool.Command != "" {
+					fmt.Printf("Command: %s\n", tool.Command)
+				} else {
+					fmt.Printf("Command: (meta-tool)\n")
+				}
 				if tool.Required {
 					fmt.Printf("Required: Yes\n")
 				} else {

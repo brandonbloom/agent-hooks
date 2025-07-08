@@ -39,6 +39,7 @@ var detectionRules = []DetectionRule{
 	{Technology: Perl, Files: []string{"*.pl"}, Desc: "Perl source files", URL: "https://www.perl.org"},
 	{Technology: PHP, Files: []string{"*.php"}, Desc: "PHP source files", URL: "https://www.php.net"},
 	{Technology: PowerShell, Files: []string{"*.ps1"}, Desc: "PowerShell scripts", URL: "https://docs.microsoft.com/en-us/powershell/"},
+	{Technology: Procfile, Files: []string{"Procfile"}, Desc: "Procfile for process management", URL: "https://devcenter.heroku.com/articles/procfile"},
 	{Technology: ProtocolBuffers, Files: []string{"*.proto"}, Desc: "Protocol Buffer files", URL: "https://developers.google.com/protocol-buffers"},
 	{Technology: Python, Files: []string{"requirements.txt", "setup.py", "pyproject.toml", "Pipfile"}, Desc: "Python project", URL: "https://www.python.org"},
 	{Technology: R, Files: []string{"*.r", "*.R"}, Desc: "R source files", URL: "https://www.r-project.org"},

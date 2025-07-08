@@ -67,30 +67,27 @@ func RunProjectChecks(verbose bool) []CheckResult {
 	return results
 }
 
+// checkProjectTool validates a tool for a specific project technology.
+// It looks up the tool definition from AllTools and delegates to the unified
+// tool checking system, using the requirement's required flag rather than
+// the tool's default required setting.
 func checkProjectTool(req ToolRequirement, verbose bool) CheckResult {
-	result := CheckResult{Name: fmt.Sprintf("%s (%s)", req.Tool, req.Technology)}
-
-	if !isCommandAvailable(req.Tool) {
-		if req.Required {
-			result.Status = CheckFailed
-			result.Message = fmt.Sprintf("%s command not found (required for %s)", req.Tool, req.Technology)
-		} else {
-			result.Status = CheckWarning
-			result.Message = fmt.Sprintf("%s command not found (optional for %s)", req.Tool, req.Technology)
-		}
-		return result
-	}
-
-	if verbose {
-		version := getProjectToolVersion(req.Tool)
-		if version != "" {
-			result.Message = fmt.Sprintf("%s is installed (%s) - %s", req.Tool, version, req.Desc)
-		} else {
-			result.Message = fmt.Sprintf("%s is installed - %s", req.Tool, req.Desc)
+	// Look up the tool definition
+	tool, exists := GetToolByName(req.Tool)
+	if !exists {
+		return CheckResult{
+			Name:    fmt.Sprintf("%s (%s)", req.Tool, req.Technology),
+			Status:  CheckFailed,
+			Message: fmt.Sprintf("Tool definition not found: %s", req.Tool),
 		}
 	}
 
-	result.Status = CheckPassed
+	// Use the unified tool checking with the requirement's required flag
+	result := checkToolWithRequired(tool, req.Required, verbose)
+
+	// Update the result name to include technology context
+	result.Name = fmt.Sprintf("%s (%s)", req.Tool, req.Technology)
+
 	return result
 }
 

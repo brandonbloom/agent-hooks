@@ -41,6 +41,7 @@ const (
 	Perl            Technology = "perl"
 	PHP             Technology = "php"
 	PowerShell      Technology = "powershell"
+	Procfile        Technology = "procfile"
 	ProtocolBuffers Technology = "protobuf"
 	Python          Technology = "python"
 	R               Technology = "r"
