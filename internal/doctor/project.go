@@ -22,7 +22,7 @@ func RunProjectChecks(verbose bool) []CheckResult {
 		return results
 	}
 
-	detector := detect.NewDetector()
+	detector := &detect.Detector{}
 	technologies, err := detector.Detect(cwd)
 	if err != nil {
 		results = append(results, CheckResult{

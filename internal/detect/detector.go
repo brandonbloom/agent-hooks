@@ -73,21 +73,27 @@ type DetectionRule struct {
 	Desc       string
 }
 
-type TechDetector interface {
-	Detect(dir string) ([]Technology, error)
-	GetRules() []DetectionRule
-	CheckRule(dir string, rule DetectionRule) (bool, error)
+type Detector struct {
+	VCSType      vcs.VCS
+	TrackedFiles []string
 }
 
-type DefaultDetector struct{}
-
-func NewDetector() TechDetector {
-	return &DefaultDetector{}
-}
-
-func (d *DefaultDetector) Detect(dir string) ([]Technology, error) {
+func (d *Detector) Detect(dir string) ([]Technology, error) {
 	var detected []Technology
 
+	// Phase 1: Do VCS detection and file listing once (if not already set)
+	if d.VCSType == "" {
+		d.VCSType, _ = vcs.DetectVCS()
+	}
+	if d.VCSType == vcs.Git && d.TrackedFiles == nil {
+		var err error
+		d.TrackedFiles, err = git.GetAllTrackedFiles()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Phase 2: Check each rule with pre-computed information
 	for _, rule := range detectionRules {
 		found, err := d.CheckRule(dir, rule)
 		if err != nil {
@@ -101,20 +107,19 @@ func (d *DefaultDetector) Detect(dir string) ([]Technology, error) {
 	return detected, nil
 }
 
-func (d *DefaultDetector) GetRules() []DetectionRule {
+func (d *Detector) GetRules() []DetectionRule {
 	return detectionRules
 }
 
-func (d *DefaultDetector) CheckRule(dir string, rule DetectionRule) (bool, error) {
+func (d *Detector) CheckRule(dir string, rule DetectionRule) (bool, error) {
 	// Special case: Git detection should use VCS walking logic
 	if rule.Technology == Git {
-		vcsType, err := vcs.DetectVCS()
-		return err == nil && vcsType == vcs.Git, nil
+		return d.VCSType == vcs.Git, nil
 	}
 
 	// For other technologies, try VCS-aware detection first
-	if vcsType, err := vcs.DetectVCS(); err == nil && vcsType == vcs.Git {
-		if found, err := d.checkRuleWithTrackedFiles(rule); err == nil {
+	if d.VCSType == vcs.Git {
+		if found, err := d.checkRuleWithTrackedFiles(rule, d.TrackedFiles); err == nil {
 			return found, nil
 		}
 		// If VCS detection fails, fall back to directory-only approach
@@ -124,7 +129,7 @@ func (d *DefaultDetector) CheckRule(dir string, rule DetectionRule) (bool, error
 	return d.checkRuleDirectoryOnly(dir, rule)
 }
 
-func (d *DefaultDetector) checkRuleDirectoryOnly(dir string, rule DetectionRule) (bool, error) {
+func (d *Detector) checkRuleDirectoryOnly(dir string, rule DetectionRule) (bool, error) {
 	for _, file := range rule.Files {
 		if containsWildcard(file) {
 			matches, err := filepath.Glob(filepath.Join(dir, file))
@@ -144,11 +149,7 @@ func (d *DefaultDetector) checkRuleDirectoryOnly(dir string, rule DetectionRule)
 	return false, nil
 }
 
-func (d *DefaultDetector) checkRuleWithTrackedFiles(rule DetectionRule) (bool, error) {
-	trackedFiles, err := git.GetAllTrackedFiles()
-	if err != nil {
-		return false, err
-	}
+func (d *Detector) checkRuleWithTrackedFiles(rule DetectionRule, trackedFiles []string) (bool, error) {
 
 	for _, file := range rule.Files {
 		if containsWildcard(file) {
@@ -176,7 +177,7 @@ func containsWildcard(path string) bool {
 }
 
 func DetectInDirectory(dir string) ([]Technology, error) {
-	detector := NewDetector()
+	detector := &Detector{}
 	return detector.Detect(dir)
 }
 

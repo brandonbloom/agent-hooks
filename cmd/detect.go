@@ -25,7 +25,7 @@ func init() {
 }
 
 func runDetect(cmd *cobra.Command, args []string) error {
-	detector := detect.NewDetector()
+	detector := &detect.Detector{}
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -33,17 +33,21 @@ func runDetect(cmd *cobra.Command, args []string) error {
 	}
 
 	if detectVerbose {
+		technologies, err := detector.Detect(cwd)
+		if err != nil {
+			return fmt.Errorf("failed to detect technologies: %w", err)
+		}
+
 		rules := detector.GetRules()
 		fmt.Printf("Checking detection rules in %s:\n", cwd)
 
-		for _, rule := range rules {
-			found, err := detector.CheckRule(cwd, rule)
-			if err != nil {
-				fmt.Printf("✗ %s: error (%v)\n", rule.Technology, err)
-				continue
-			}
+		techSet := make(map[detect.Technology]bool)
+		for _, tech := range technologies {
+			techSet[tech] = true
+		}
 
-			if found {
+		for _, rule := range rules {
+			if techSet[rule.Technology] {
 				fmt.Printf("✓ %s: %s\n", rule.Technology, rule.Desc)
 			} else {
 				fmt.Printf("✗ %s: not detected\n", rule.Technology)
