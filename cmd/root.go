@@ -13,8 +13,9 @@ var rootCmd = &cobra.Command{
 	Long: `agent-hooks provides zero-config convenience commands that can be used
 by both humans and AI agents. It respects existing project configurations
 when available but requires no special setup to be useful.`,
-	Version:      getVersionString(),
-	SilenceUsage: true,
+	Version:       getVersionString(),
+	SilenceUsage:  true,
+	SilenceErrors: true,
 }
 
 func Execute() {

@@ -93,10 +93,7 @@ Currently requires a Git repository and supports Go files.`,
 		}
 
 		if len(result.Errors) > 0 {
-			for _, errMsg := range result.Errors {
-				fmt.Fprintf(os.Stderr, "Error: %s\n", errMsg)
-			}
-			return fmt.Errorf("formatting failed")
+			return fmt.Errorf(result.Errors[0])
 		}
 
 		return nil

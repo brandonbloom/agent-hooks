@@ -119,7 +119,7 @@ func (d *DefaultDetector) CheckRule(dir string, rule DetectionRule) (bool, error
 		vcsType, err := vcs.DetectVCS()
 		return err == nil && vcsType == vcs.Git, nil
 	}
-	
+
 	// For other technologies, try VCS-aware detection first
 	if vcsType, err := vcs.DetectVCS(); err == nil && vcsType == vcs.Git {
 		if found, err := d.checkRuleWithTrackedFiles(rule); err == nil {
@@ -127,7 +127,7 @@ func (d *DefaultDetector) CheckRule(dir string, rule DetectionRule) (bool, error
 		}
 		// If VCS detection fails, fall back to directory-only approach
 	}
-	
+
 	// Fallback to current directory-only approach
 	return d.checkRuleDirectoryOnly(dir, rule)
 }
@@ -157,7 +157,7 @@ func (d *DefaultDetector) checkRuleWithTrackedFiles(rule DetectionRule) (bool, e
 	if err != nil {
 		return false, err
 	}
-	
+
 	for _, file := range rule.Files {
 		if containsWildcard(file) {
 			// Check pattern against all tracked files
