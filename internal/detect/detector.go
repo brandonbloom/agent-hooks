@@ -12,22 +12,59 @@ import (
 type Technology string
 
 const (
-	Git        Technology = "git"
-	Go         Technology = "go"
-	NodeJS     Technology = "nodejs"
-	React      Technology = "react"
-	Vue        Technology = "vue"
-	Svelte     Technology = "svelte"
-	NextJS     Technology = "nextjs"
-	Nuxt       Technology = "nuxt"
-	Angular    Technology = "angular"
-	Python     Technology = "python"
-	Rust       Technology = "rust"
-	Ruby       Technology = "ruby"
-	Java       Technology = "java"
-	Clojure    Technology = "clojure"
-	Transcript Technology = "transcript"
-	Hurl       Technology = "hurl"
+	Git             Technology = "git"
+	Go              Technology = "go"
+	NodeJS          Technology = "nodejs"
+	React           Technology = "react"
+	Vue             Technology = "vue"
+	Svelte          Technology = "svelte"
+	NextJS          Technology = "nextjs"
+	Nuxt            Technology = "nuxt"
+	Angular         Technology = "angular"
+	Python          Technology = "python"
+	Rust            Technology = "rust"
+	Ruby            Technology = "ruby"
+	Java            Technology = "java"
+	Clojure         Technology = "clojure"
+	Transcript      Technology = "transcript"
+	Hurl            Technology = "hurl"
+	C               Technology = "c"
+	Cpp             Technology = "cpp"
+	TypeScript      Technology = "typescript"
+	JavaScript      Technology = "javascript"
+	Swift           Technology = "swift"
+	Kotlin          Technology = "kotlin"
+	CSharp          Technology = "csharp"
+	PHP             Technology = "php"
+	Dart            Technology = "dart"
+	Haskell         Technology = "haskell"
+	Perl            Technology = "perl"
+	Lua             Technology = "lua"
+	Shell           Technology = "shell"
+	Markdown        Technology = "markdown"
+	HTML            Technology = "html"
+	CSS             Technology = "css"
+	OCaml           Technology = "ocaml"
+	VimScript       Technology = "vimscript"
+	Assembly        Technology = "assembly"
+	CoffeeScript    Technology = "coffeescript"
+	Elixir          Technology = "elixir"
+	Erlang          Technology = "erlang"
+	Fortran         Technology = "fortran"
+	Zig             Technology = "zig"
+	JSON            Technology = "json"
+	YAML            Technology = "yaml"
+	XML             Technology = "xml"
+	SQL             Technology = "sql"
+	ProtocolBuffers Technology = "protobuf"
+	GraphQL         Technology = "graphql"
+	R               Technology = "r"
+	TOML            Technology = "toml"
+	INI             Technology = "ini"
+	LaTeX           Technology = "latex"
+	PowerShell      Technology = "powershell"
+	Batch           Technology = "batch"
+	Make            Technology = "make"
 )
 
 type DetectionRule struct {
@@ -72,6 +109,43 @@ var detectionRules = []DetectionRule{
 	{Technology: Clojure, Files: []string{"project.clj", "deps.edn", "shadow-cljs.edn", "bb.edn"}, Desc: "Clojure project"},
 	{Technology: Transcript, Files: []string{"*.cmdt"}, Desc: "Transcript test files"},
 	{Technology: Hurl, Files: []string{"*.hurl"}, Desc: "Hurl HTTP test files"},
+	{Technology: C, Files: []string{"*.c", "*.h"}, Desc: "C source files"},
+	{Technology: Cpp, Files: []string{"*.cpp", "*.cc", "*.cxx", "*.hpp", "*.hh", "*.hxx"}, Desc: "C++ source files"},
+	{Technology: TypeScript, Files: []string{"*.ts", "*.dts"}, Desc: "TypeScript source files"},
+	{Technology: JavaScript, Files: []string{"*.js", "*.mjs", "*.cjs"}, Desc: "JavaScript source files"},
+	{Technology: Swift, Files: []string{"*.swift"}, Desc: "Swift source files"},
+	{Technology: Kotlin, Files: []string{"*.kt", "*.kts"}, Desc: "Kotlin source files"},
+	{Technology: CSharp, Files: []string{"*.cs"}, Desc: "C# source files"},
+	{Technology: PHP, Files: []string{"*.php"}, Desc: "PHP source files"},
+	{Technology: Dart, Files: []string{"*.dart"}, Desc: "Dart source files"},
+	{Technology: Haskell, Files: []string{"*.hs"}, Desc: "Haskell source files"},
+	{Technology: Perl, Files: []string{"*.pl"}, Desc: "Perl source files"},
+	{Technology: Lua, Files: []string{"*.lua"}, Desc: "Lua source files"},
+	{Technology: Shell, Files: []string{"*.sh", "*.bash", "*.zsh", "*.fish"}, Desc: "Shell scripts"},
+	{Technology: Markdown, Files: []string{"*.md", "*.markdown"}, Desc: "Markdown files"},
+	{Technology: HTML, Files: []string{"*.html", "*.htm"}, Desc: "HTML files"},
+	{Technology: CSS, Files: []string{"*.css", "*.scss", "*.sass", "*.less"}, Desc: "CSS and preprocessor files"},
+	{Technology: OCaml, Files: []string{"*.ml", "*.mli"}, Desc: "OCaml source files"},
+	{Technology: VimScript, Files: []string{"*.vim"}, Desc: "Vim script files"},
+	{Technology: Assembly, Files: []string{"*.asm", "*.s", "*.S"}, Desc: "Assembly source files"},
+	{Technology: CoffeeScript, Files: []string{"*.coffee"}, Desc: "CoffeeScript source files"},
+	{Technology: Elixir, Files: []string{"*.ex", "*.exs"}, Desc: "Elixir source files"},
+	{Technology: Erlang, Files: []string{"*.erl"}, Desc: "Erlang source files"},
+	{Technology: Fortran, Files: []string{"*.f90"}, Desc: "Fortran source files"},
+	{Technology: Zig, Files: []string{"*.zig"}, Desc: "Zig source files"},
+	{Technology: JSON, Files: []string{"*.json"}, Desc: "JSON files"},
+	{Technology: YAML, Files: []string{"*.yaml", "*.yml"}, Desc: "YAML files"},
+	{Technology: XML, Files: []string{"*.xml"}, Desc: "XML files"},
+	{Technology: SQL, Files: []string{"*.sql"}, Desc: "SQL files"},
+	{Technology: ProtocolBuffers, Files: []string{"*.proto"}, Desc: "Protocol Buffer files"},
+	{Technology: GraphQL, Files: []string{"*.graphql", "*.gql"}, Desc: "GraphQL files"},
+	{Technology: R, Files: []string{"*.r", "*.R"}, Desc: "R source files"},
+	{Technology: TOML, Files: []string{"*.toml"}, Desc: "TOML files"},
+	{Technology: INI, Files: []string{"*.ini", "*.cfg", "*.conf"}, Desc: "INI/Config files"},
+	{Technology: LaTeX, Files: []string{"*.tex"}, Desc: "LaTeX files"},
+	{Technology: PowerShell, Files: []string{"*.ps1"}, Desc: "PowerShell scripts"},
+	{Technology: Batch, Files: []string{"*.bat", "*.cmd"}, Desc: "Batch files"},
+	{Technology: Make, Files: []string{"Makefile", "makefile", "*.mk"}, Desc: "Makefiles"},
 }
 
 var toolRequirements = []ToolRequirement{
