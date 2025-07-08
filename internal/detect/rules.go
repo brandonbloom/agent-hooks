@@ -13,6 +13,7 @@ var detectionRules = []DetectionRule{
 	{Technology: CSS, Files: []string{"*.css", "*.scss", "*.sass", "*.less"}, Desc: "CSS and preprocessor files"},
 	{Technology: CSharp, Files: []string{"*.cs"}, Desc: "C# source files"},
 	{Technology: Dart, Files: []string{"*.dart"}, Desc: "Dart source files"},
+	{Technology: Direnv, Files: []string{".envrc"}, Desc: "Direnv environment configuration"},
 	{Technology: Elixir, Files: []string{"*.ex", "*.exs"}, Desc: "Elixir source files"},
 	{Technology: Erlang, Files: []string{"*.erl"}, Desc: "Erlang source files"},
 	{Technology: Fortran, Files: []string{"*.f90"}, Desc: "Fortran source files"},

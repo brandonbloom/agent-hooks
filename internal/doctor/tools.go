@@ -31,6 +31,7 @@ type ToolCheck struct {
 // when adding new tools. Please maintain this order.
 var DefaultTools = []ToolCheck{
 	{Name: "agent-hooks", Command: "agent-hooks", Required: false},
+	{Name: "direnv", Command: "direnv", Required: false},
 	{Name: "git", Command: "git", Required: true},
 	{Name: "go", Command: "go", Required: false},
 	{Name: "goimports", Command: "goimports", Required: false},
@@ -97,6 +98,7 @@ func getToolVersion(command string) string {
 	// when adding new tools. Please maintain this order.
 	versionArgs := map[string][]string{
 		"agent-hooks": {"--version"},
+		"direnv":      {"version"},
 		"git":         {"--version"},
 		"go":          {"version"},
 		"goimports":   {"--help"},

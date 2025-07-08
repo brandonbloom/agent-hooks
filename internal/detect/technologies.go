@@ -15,6 +15,7 @@ const (
 	CSS             Technology = "css"
 	CSharp          Technology = "csharp"
 	Dart            Technology = "dart"
+	Direnv          Technology = "direnv"
 	Elixir          Technology = "elixir"
 	Erlang          Technology = "erlang"
 	Fortran         Technology = "fortran"
