@@ -15,6 +15,12 @@ const (
 	Git        Technology = "git"
 	Go         Technology = "go"
 	NodeJS     Technology = "nodejs"
+	React      Technology = "react"
+	Vue        Technology = "vue"
+	Svelte     Technology = "svelte"
+	NextJS     Technology = "nextjs"
+	Nuxt       Technology = "nuxt"
+	Angular    Technology = "angular"
 	Python     Technology = "python"
 	Rust       Technology = "rust"
 	Ruby       Technology = "ruby"
@@ -40,8 +46,11 @@ type TechDetector interface {
 type ToolRequirement struct {
 	Technology Technology
 	Tool       string
-	Required   bool
-	Desc       string
+	// Required determines how the doctor command reports missing tools:
+	// - true: Missing tool shows as ERROR (project can't function without it)
+	// - false: Missing tool shows as WARNING (optional, alternatives may exist)
+	Required bool
+	Desc     string
 }
 
 type DefaultDetector struct{}
@@ -50,6 +59,12 @@ var detectionRules = []DetectionRule{
 	{Technology: Git, Files: []string{".git"}, Desc: "Git repository"},
 	{Technology: Go, Files: []string{"go.mod", "*.go"}, Desc: "Go module or Go files"},
 	{Technology: NodeJS, Files: []string{"package.json"}, Desc: "Node.js package"},
+	{Technology: React, Files: []string{"*.jsx", "*.tsx"}, Desc: "React project"},
+	{Technology: Vue, Files: []string{"*.vue", "vue.config.js", "vue.config.ts"}, Desc: "Vue.js project"},
+	{Technology: Svelte, Files: []string{"*.svelte", "svelte.config.js", "vite.config.js"}, Desc: "Svelte project"},
+	{Technology: NextJS, Files: []string{"next.config.js", "next.config.mjs", "next.config.ts"}, Desc: "Next.js project"},
+	{Technology: Nuxt, Files: []string{"nuxt.config.js", "nuxt.config.ts"}, Desc: "Nuxt.js project"},
+	{Technology: Angular, Files: []string{"angular.json", "*.component.ts"}, Desc: "Angular project"},
 	{Technology: Python, Files: []string{"requirements.txt", "setup.py", "pyproject.toml", "Pipfile"}, Desc: "Python project"},
 	{Technology: Rust, Files: []string{"Cargo.toml"}, Desc: "Rust project"},
 	{Technology: Ruby, Files: []string{"Gemfile"}, Desc: "Ruby project"},
@@ -65,6 +80,19 @@ var toolRequirements = []ToolRequirement{
 	{Technology: Go, Tool: "gofmt", Required: false, Desc: "Go code formatter"},
 	{Technology: NodeJS, Tool: "node", Required: true, Desc: "Node.js runtime"},
 	{Technology: NodeJS, Tool: "npm", Required: false, Desc: "Node.js package manager"},
+	{Technology: React, Tool: "node", Required: true, Desc: "Node.js runtime for React"},
+	{Technology: React, Tool: "npm", Required: false, Desc: "Package manager for React"},
+	{Technology: Vue, Tool: "node", Required: true, Desc: "Node.js runtime for Vue.js"},
+	{Technology: Vue, Tool: "npm", Required: false, Desc: "Package manager for Vue.js"},
+	{Technology: Svelte, Tool: "node", Required: true, Desc: "Node.js runtime for Svelte"},
+	{Technology: Svelte, Tool: "npm", Required: false, Desc: "Package manager for Svelte"},
+	{Technology: NextJS, Tool: "node", Required: true, Desc: "Node.js runtime for Next.js"},
+	{Technology: NextJS, Tool: "npm", Required: false, Desc: "Package manager for Next.js"},
+	{Technology: Nuxt, Tool: "node", Required: true, Desc: "Node.js runtime for Nuxt.js"},
+	{Technology: Nuxt, Tool: "npm", Required: false, Desc: "Package manager for Nuxt.js"},
+	{Technology: Angular, Tool: "node", Required: true, Desc: "Node.js runtime for Angular"},
+	{Technology: Angular, Tool: "npm", Required: false, Desc: "Package manager for Angular"},
+	{Technology: Angular, Tool: "ng", Required: false, Desc: "Angular CLI"},
 	{Technology: Python, Tool: "python", Required: true, Desc: "Python interpreter"},
 	{Technology: Python, Tool: "pip", Required: false, Desc: "Python package manager"},
 	{Technology: Rust, Tool: "cargo", Required: true, Desc: "Rust package manager"},
