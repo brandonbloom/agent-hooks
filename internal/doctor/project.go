@@ -57,7 +57,7 @@ func RunProjectChecks(verbose bool) []CheckResult {
 	}
 
 	for _, tech := range technologies {
-		requirements := detector.GetToolRequirements(tech)
+		requirements := GetToolRequirements(tech)
 		for _, req := range requirements {
 			result := checkProjectTool(req, verbose)
 			results = append(results, result)
@@ -67,7 +67,7 @@ func RunProjectChecks(verbose bool) []CheckResult {
 	return results
 }
 
-func checkProjectTool(req detect.ToolRequirement, verbose bool) CheckResult {
+func checkProjectTool(req ToolRequirement, verbose bool) CheckResult {
 	result := CheckResult{Name: fmt.Sprintf("%s (%s)", req.Tool, req.Technology)}
 
 	if !isCommandAvailable(req.Tool) {
