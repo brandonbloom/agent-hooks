@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/brandonbloom/agent-hooks/internal/git"
+	"github.com/brandonbloom/agent-hooks/internal/vcs"
 )
 
 type Technology string
@@ -31,6 +34,7 @@ type TechDetector interface {
 	Detect(dir string) ([]Technology, error)
 	GetRules() []DetectionRule
 	GetToolRequirements(tech Technology) []ToolRequirement
+	CheckRule(dir string, rule DetectionRule) (bool, error)
 }
 
 type ToolRequirement struct {
@@ -44,7 +48,7 @@ type DefaultDetector struct{}
 
 var detectionRules = []DetectionRule{
 	{Technology: Git, Files: []string{".git"}, Desc: "Git repository"},
-	{Technology: Go, Files: []string{"go.mod"}, Desc: "Go module"},
+	{Technology: Go, Files: []string{"go.mod", "*.go"}, Desc: "Go module or Go files"},
 	{Technology: NodeJS, Files: []string{"package.json"}, Desc: "Node.js package"},
 	{Technology: Python, Files: []string{"requirements.txt", "setup.py", "pyproject.toml", "Pipfile"}, Desc: "Python project"},
 	{Technology: Rust, Files: []string{"Cargo.toml"}, Desc: "Rust project"},
@@ -83,7 +87,7 @@ func (d *DefaultDetector) Detect(dir string) ([]Technology, error) {
 	var detected []Technology
 
 	for _, rule := range detectionRules {
-		found, err := d.checkRule(dir, rule)
+		found, err := d.CheckRule(dir, rule)
 		if err != nil {
 			continue
 		}
@@ -109,7 +113,26 @@ func (d *DefaultDetector) GetToolRequirements(tech Technology) []ToolRequirement
 	return requirements
 }
 
-func (d *DefaultDetector) checkRule(dir string, rule DetectionRule) (bool, error) {
+func (d *DefaultDetector) CheckRule(dir string, rule DetectionRule) (bool, error) {
+	// Special case: Git detection should use VCS walking logic
+	if rule.Technology == Git {
+		vcsType, err := vcs.DetectVCS()
+		return err == nil && vcsType == vcs.Git, nil
+	}
+	
+	// For other technologies, try VCS-aware detection first
+	if vcsType, err := vcs.DetectVCS(); err == nil && vcsType == vcs.Git {
+		if found, err := d.checkRuleWithTrackedFiles(rule); err == nil {
+			return found, nil
+		}
+		// If VCS detection fails, fall back to directory-only approach
+	}
+	
+	// Fallback to current directory-only approach
+	return d.checkRuleDirectoryOnly(dir, rule)
+}
+
+func (d *DefaultDetector) checkRuleDirectoryOnly(dir string, rule DetectionRule) (bool, error) {
 	for _, file := range rule.Files {
 		if containsWildcard(file) {
 			matches, err := filepath.Glob(filepath.Join(dir, file))
@@ -123,6 +146,32 @@ func (d *DefaultDetector) checkRule(dir string, rule DetectionRule) (bool, error
 			path := filepath.Join(dir, file)
 			if _, err := os.Stat(path); err == nil {
 				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+func (d *DefaultDetector) checkRuleWithTrackedFiles(rule DetectionRule) (bool, error) {
+	trackedFiles, err := git.GetAllTrackedFiles()
+	if err != nil {
+		return false, err
+	}
+	
+	for _, file := range rule.Files {
+		if containsWildcard(file) {
+			// Check pattern against all tracked files
+			for _, tracked := range trackedFiles {
+				if matched, _ := filepath.Match(file, filepath.Base(tracked)); matched {
+					return true, nil
+				}
+			}
+		} else {
+			// Check exact match in tracked files
+			for _, tracked := range trackedFiles {
+				if tracked == file || filepath.Base(tracked) == file {
+					return true, nil
+				}
 			}
 		}
 	}

@@ -37,21 +37,10 @@ func runDetect(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Checking detection rules in %s:\n", cwd)
 
 		for _, rule := range rules {
-			found := false
-			for _, file := range rule.Files {
-				if containsWildcard(file) {
-					matches, err := filepath.Glob(filepath.Join(cwd, file))
-					if err == nil && len(matches) > 0 {
-						found = true
-						break
-					}
-				} else {
-					path := filepath.Join(cwd, file)
-					if _, err := os.Stat(path); err == nil {
-						found = true
-						break
-					}
-				}
+			found, err := detector.CheckRule(cwd, rule)
+			if err != nil {
+				fmt.Printf("✗ %s: error (%v)\n", rule.Technology, err)
+				continue
 			}
 
 			if found {
