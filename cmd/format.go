@@ -17,13 +17,20 @@ var (
 )
 
 var formatCmd = &cobra.Command{
-	Use:   "format",
+	Use:   "format [files...]",
 	Short: "Format code in the current project",
 	Long: `Formats code in the current project using appropriate tools.
-Only formats changed files by default. Use --all-files to format all tracked files.
+With no arguments, formats only changed files.
+With file arguments, formats only those specific files.
+Use --all-files to format all tracked files (mutually exclusive with file arguments).
 Use --dry-run to preview what would be formatted without making changes.
 Currently requires a Git repository and supports Go files.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Validate mutually exclusive options
+		if allFiles && len(args) > 0 {
+			return fmt.Errorf("cannot use --all-files with specific file arguments")
+		}
+
 		detectedVcs, err := vcs.DetectVCS()
 		if err != nil {
 			return fmt.Errorf("cannot format: %w", err)
@@ -35,13 +42,18 @@ Currently requires a Git repository and supports Go files.`,
 
 		var filesToFormat []string
 
-		if allFiles {
+		if len(args) > 0 {
+			// Format specific files provided as arguments
+			filesToFormat = args
+		} else if allFiles {
+			// Format all tracked files
 			trackedFiles, err := git.GetAllTrackedFiles()
 			if err != nil {
 				return fmt.Errorf("failed to get tracked files: %w", err)
 			}
 			filesToFormat = trackedFiles
 		} else {
+			// Format only changed files (default behavior)
 			changedFiles, err := git.GetChangedFiles()
 			if err != nil {
 				return fmt.Errorf("failed to get changed files: %w", err)
