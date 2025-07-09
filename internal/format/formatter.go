@@ -113,6 +113,15 @@ func formatWithTool(toolName string, files []string, result *Result, opts Option
 	}
 }
 
+// formatWithCommandCheck checks command availability and executes formatting with common error handling
+func formatWithCommandCheck(command string, errorMessage string, toolName string, cmdArgs []string, files []string, result *Result, opts Options) error {
+	if !isCommandAvailable(command) {
+		return fmt.Errorf(errorMessage)
+	}
+	
+	return runFormatterCommand(toolName, cmdArgs, files, result, opts)
+}
+
 // runFormatterCommand executes a formatter command on a set of files with common error handling
 func runFormatterCommand(toolName string, cmdArgs []string, files []string, result *Result, opts Options) error {
 	for _, file := range files {
@@ -134,35 +143,19 @@ func runFormatterCommand(toolName string, cmdArgs []string, files []string, resu
 }
 
 func formatWithGoimports(files []string, result *Result, opts Options) error {
-	if !isCommandAvailable("goimports") {
-		return fmt.Errorf("goimports command not found - install with: go install golang.org/x/tools/cmd/goimports@latest")
-	}
-
-	return runFormatterCommand("goimports", []string{"goimports", "-w"}, files, result, opts)
+	return formatWithCommandCheck("goimports", "goimports command not found - install with: go install golang.org/x/tools/cmd/goimports@latest", "goimports", []string{"goimports", "-w"}, files, result, opts)
 }
 
 func formatWithGofmt(files []string, result *Result, opts Options) error {
-	if !isCommandAvailable("gofmt") {
-		return fmt.Errorf("gofmt command not found")
-	}
-
-	return runFormatterCommand("gofmt", []string{"gofmt", "-w"}, files, result, opts)
+	return formatWithCommandCheck("gofmt", "gofmt command not found", "gofmt", []string{"gofmt", "-w"}, files, result, opts)
 }
 
 func formatWithBiome(files []string, result *Result, opts Options) error {
-	if !isCommandAvailable("biome") {
-		return fmt.Errorf("biome command not found - install with: npm install -g @biomejs/biome")
-	}
-
-	return runFormatterCommand("biome", []string{"biome", "format", "--write"}, files, result, opts)
+	return formatWithCommandCheck("biome", "biome command not found - install with: npm install -g @biomejs/biome", "biome", []string{"biome", "format", "--write"}, files, result, opts)
 }
 
 func formatWithPrettier(files []string, result *Result, opts Options) error {
-	if !isCommandAvailable("npx") {
-		return fmt.Errorf("npx command not found - install Node.js to get npx")
-	}
-
-	return runFormatterCommand("prettier", []string{"npx", "prettier", "--write"}, files, result, opts)
+	return formatWithCommandCheck("npx", "npx command not found - install Node.js to get npx", "prettier", []string{"npx", "prettier", "--write"}, files, result, opts)
 }
 
 func filterFilesByExtension(files []string, ext string) []string {
