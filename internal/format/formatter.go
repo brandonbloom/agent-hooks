@@ -125,8 +125,8 @@ func formatWithGoimports(files []string, result *Result, opts Options) error {
 		}
 
 		cmd := exec.Command("goimports", "-w", file)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to format %s with goimports: %w", file, err)
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("failed to format %s with goimports: %w\nOutput: %s", file, err, string(output))
 		}
 		result.FormattedFiles = append(result.FormattedFiles, file)
 	}
@@ -146,8 +146,8 @@ func formatWithGofmt(files []string, result *Result, opts Options) error {
 		}
 
 		cmd := exec.Command("gofmt", "-w", file)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to format %s with gofmt: %w", file, err)
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("failed to format %s with gofmt: %w\nOutput: %s", file, err, string(output))
 		}
 		result.FormattedFiles = append(result.FormattedFiles, file)
 	}
@@ -167,8 +167,8 @@ func formatWithBiome(files []string, result *Result, opts Options) error {
 		}
 
 		cmd := exec.Command("biome", "format", "--write", file)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to format %s with biome: %w", file, err)
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("failed to format %s with biome: %w\nOutput: %s", file, err, string(output))
 		}
 		result.FormattedFiles = append(result.FormattedFiles, file)
 	}
@@ -188,8 +188,8 @@ func formatWithPrettier(files []string, result *Result, opts Options) error {
 		}
 
 		cmd := exec.Command("npx", "prettier", "--write", file)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("failed to format %s with prettier: %w", file, err)
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("failed to format %s with prettier: %w\nOutput: %s", file, err, string(output))
 		}
 		result.FormattedFiles = append(result.FormattedFiles, file)
 	}
