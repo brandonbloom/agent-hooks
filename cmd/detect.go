@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/brandonbloom/agent-hooks/internal/detect"
 	"github.com/spf13/cobra"
@@ -32,40 +31,39 @@ func runDetect(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get current directory: %w", err)
 	}
 
-	if detectVerbose {
-		evidence, err := detector.DetectWithEvidence(cwd)
-		if err != nil {
-			return fmt.Errorf("failed to detect technologies: %w", err)
-		}
+	evidence, err := detector.DetectWithEvidence(cwd)
+	if err != nil {
+		return fmt.Errorf("failed to detect technologies: %w", err)
+	}
 
+	if detectVerbose {
 		fmt.Printf("Checking detection rules in %s:\n", cwd)
 
-		for _, ev := range evidence {
-			if ev.Found {
-				fmt.Printf("✓ %s: %s\n", ev.Technology, ev.FormatEvidence())
+		for _, result := range evidence {
+			if result.Found {
+				fmt.Printf("✓ %s: %s\n", result.Technology, result.FormatEvidence())
 			} else {
-				fmt.Printf("✗ %s: not detected\n", ev.Technology)
+				fmt.Printf("✗ %s: not detected\n", result.Technology)
 			}
 		}
 		return nil
 	}
 
-	technologies, err := detector.Detect(cwd)
-	if err != nil {
-		return fmt.Errorf("failed to detect technologies: %w", err)
+	// Non-verbose mode: only show detected technologies
+	var detected []detect.Technology
+	for _, result := range evidence {
+		if result.Found {
+			detected = append(detected, result.Technology)
+		}
 	}
 
-	if len(technologies) == 0 {
+	if len(detected) == 0 {
 		return nil
 	}
 
-	for _, tech := range technologies {
+	for _, tech := range detected {
 		fmt.Printf("%s\n", tech)
 	}
 
 	return nil
-}
-
-func containsWildcard(path string) bool {
-	return filepath.Base(path) != path && (filepath.Base(path)[0] == '*' || filepath.Base(path)[len(filepath.Base(path))-1] == '*')
 }

@@ -120,17 +120,25 @@ func (d *Detector) CheckRuleWithEvidence(dir string, rule DetectionRule) Detecti
 
 	// For other technologies, try VCS-aware detection first
 	if d.VCSType == vcs.Git {
-		if vcsEvidence := d.checkRuleWithTrackedFiles(rule, d.TrackedFiles); vcsEvidence.Found {
+		if vcsEvidence := d.checkRuleByTrackedFiles(rule, d.TrackedFiles); vcsEvidence.Found {
 			return vcsEvidence
 		}
 		// If VCS detection fails, fall back to directory-only approach
 	}
 
 	// Fallback to current directory-only approach
-	return d.checkRuleDirectoryOnly(dir, rule)
+	return d.checkRuleByDirectoryScan(dir, rule)
 }
 
-func (d *Detector) checkRuleDirectoryOnly(dir string, rule DetectionRule) DetectionEvidence {
+func (d *Detector) addPatternMatches(evidence *DetectionEvidence, pattern string, matches []string) {
+	if len(matches) > 0 {
+		evidence.Found = true
+		evidence.PatternCounts[pattern] = len(matches)
+		evidence.MatchedFiles = append(evidence.MatchedFiles, matches...)
+	}
+}
+
+func (d *Detector) checkRuleByDirectoryScan(dir string, rule DetectionRule) DetectionEvidence {
 	evidence := DetectionEvidence{
 		Technology:    rule.Technology,
 		Found:         false,
@@ -145,13 +153,11 @@ func (d *Detector) checkRuleDirectoryOnly(dir string, rule DetectionRule) Detect
 			if err != nil {
 				continue
 			}
-			if len(matches) > 0 {
-				evidence.Found = true
-				evidence.PatternCounts[file] = len(matches)
-				for _, match := range matches {
-					evidence.MatchedFiles = append(evidence.MatchedFiles, filepath.Base(match))
-				}
+			var matchedFiles []string
+			for _, match := range matches {
+				matchedFiles = append(matchedFiles, filepath.Base(match))
 			}
+			d.addPatternMatches(&evidence, file, matchedFiles)
 		} else {
 			path := filepath.Join(dir, file)
 			if _, err := os.Stat(path); err == nil {
@@ -163,7 +169,7 @@ func (d *Detector) checkRuleDirectoryOnly(dir string, rule DetectionRule) Detect
 	return evidence
 }
 
-func (d *Detector) checkRuleWithTrackedFiles(rule DetectionRule, trackedFiles []string) DetectionEvidence {
+func (d *Detector) checkRuleByTrackedFiles(rule DetectionRule, trackedFiles []string) DetectionEvidence {
 	evidence := DetectionEvidence{
 		Technology:    rule.Technology,
 		Found:         false,
@@ -174,20 +180,14 @@ func (d *Detector) checkRuleWithTrackedFiles(rule DetectionRule, trackedFiles []
 
 	for _, file := range rule.Files {
 		if containsWildcard(file) {
-			// For wildcards, check patterns against tracked files
-			matchedFiles := []string{}
+			var matchedFiles []string
 			for _, trackedFile := range trackedFiles {
 				if matched, _ := filepath.Match(file, filepath.Base(trackedFile)); matched {
 					matchedFiles = append(matchedFiles, trackedFile)
 				}
 			}
-			if len(matchedFiles) > 0 {
-				evidence.Found = true
-				evidence.PatternCounts[file] = len(matchedFiles)
-				evidence.MatchedFiles = append(evidence.MatchedFiles, matchedFiles...)
-			}
+			d.addPatternMatches(&evidence, file, matchedFiles)
 		} else {
-			// Fast exact match lookup
 			if d.fileIndex[file] {
 				evidence.Found = true
 				evidence.MatchedFiles = append(evidence.MatchedFiles, file)
