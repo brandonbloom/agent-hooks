@@ -113,49 +113,89 @@ func formatWithTool(toolName string, files []string, result *Result, opts Option
 	}
 }
 
-// formatWithCommandCheck checks command availability and executes formatting with common error handling
-func formatWithCommandCheck(command string, errorMessage string, toolName string, cmdArgs []string, files []string, result *Result, opts Options) error {
-	if !isCommandAvailable(command) {
-		return fmt.Errorf(errorMessage)
-	}
-	
-	return runFormatterCommand(toolName, cmdArgs, files, result, opts)
+// formatterCommand encapsulates the parameters needed for formatting with availability checking
+type formatterCommand struct {
+	command      string   // command to check availability for
+	errorMessage string   // error message if command not available
+	toolName     string   // name of the tool for error messages
+	cmdArgs      []string // the command arguments
+	files        []string // files to format
+	result       *Result  // result structure to populate
+	opts         Options  // options for formatting
 }
 
-// runFormatterCommand executes a formatter command on a set of files with common error handling
-func runFormatterCommand(toolName string, cmdArgs []string, files []string, result *Result, opts Options) error {
-	for _, file := range files {
-		if opts.DryRun {
-			result.FormattedFiles = append(result.FormattedFiles, file)
+// Run executes the formatter command with availability checking and error handling
+func (fc *formatterCommand) Run() error {
+	// Check availability
+	if !isCommandAvailable(fc.command) {
+		return fmt.Errorf(fc.errorMessage)
+	}
+	
+	// Execute formatting
+	for _, file := range fc.files {
+		if fc.opts.DryRun {
+			fc.result.FormattedFiles = append(fc.result.FormattedFiles, file)
 			continue
 		}
 
 		// Build command with file appended
-		fullArgs := append(cmdArgs, file)
+		fullArgs := append(fc.cmdArgs, file)
 		cmd := exec.Command(fullArgs[0], fullArgs[1:]...)
 		if output, err := cmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("failed to format %s with %s: %w\nOutput: %s", file, toolName, err, string(output))
+			return fmt.Errorf("failed to format %s with %s: %w\nOutput: %s", file, fc.toolName, err, string(output))
 		}
-		result.FormattedFiles = append(result.FormattedFiles, file)
+		fc.result.FormattedFiles = append(fc.result.FormattedFiles, file)
 	}
 
 	return nil
 }
 
 func formatWithGoimports(files []string, result *Result, opts Options) error {
-	return formatWithCommandCheck("goimports", "goimports command not found - install with: go install golang.org/x/tools/cmd/goimports@latest", "goimports", []string{"goimports", "-w"}, files, result, opts)
+	return (&formatterCommand{
+		command:      "goimports",
+		errorMessage: "goimports command not found - install with: go install golang.org/x/tools/cmd/goimports@latest",
+		toolName:     "goimports",
+		cmdArgs:      []string{"goimports", "-w"},
+		files:        files,
+		result:       result,
+		opts:         opts,
+	}).Run()
 }
 
 func formatWithGofmt(files []string, result *Result, opts Options) error {
-	return formatWithCommandCheck("gofmt", "gofmt command not found", "gofmt", []string{"gofmt", "-w"}, files, result, opts)
+	return (&formatterCommand{
+		command:      "gofmt",
+		errorMessage: "gofmt command not found",
+		toolName:     "gofmt",
+		cmdArgs:      []string{"gofmt", "-w"},
+		files:        files,
+		result:       result,
+		opts:         opts,
+	}).Run()
 }
 
 func formatWithBiome(files []string, result *Result, opts Options) error {
-	return formatWithCommandCheck("biome", "biome command not found - install with: npm install -g @biomejs/biome", "biome", []string{"biome", "format", "--write"}, files, result, opts)
+	return (&formatterCommand{
+		command:      "biome",
+		errorMessage: "biome command not found - install with: npm install -g @biomejs/biome",
+		toolName:     "biome",
+		cmdArgs:      []string{"biome", "format", "--write"},
+		files:        files,
+		result:       result,
+		opts:         opts,
+	}).Run()
 }
 
 func formatWithPrettier(files []string, result *Result, opts Options) error {
-	return formatWithCommandCheck("npx", "npx command not found - install Node.js to get npx", "prettier", []string{"npx", "prettier", "--write"}, files, result, opts)
+	return (&formatterCommand{
+		command:      "npx",
+		errorMessage: "npx command not found - install Node.js to get npx",
+		toolName:     "prettier",
+		cmdArgs:      []string{"npx", "prettier", "--write"},
+		files:        files,
+		result:       result,
+		opts:         opts,
+	}).Run()
 }
 
 func filterFilesByExtension(files []string, ext string) []string {
