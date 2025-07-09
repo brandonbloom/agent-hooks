@@ -12,6 +12,9 @@ Developer and contributor guide for the agent-hooks CLI tool.
 - **Silence is golden**: Commands produce no output on success, only warnings 
   and errors when needed
 - **Do no harm**: Prefer warnings over failures, only fail on critical errors
+- **Verbose instrumentation**: Verbose modes should instrument the same code 
+  rather than doing extra work. Verbosity is about output formatting, not 
+  logic or behavior changes
 
 ## Project Structure
 

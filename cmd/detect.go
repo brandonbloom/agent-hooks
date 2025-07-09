@@ -33,24 +33,18 @@ func runDetect(cmd *cobra.Command, args []string) error {
 	}
 
 	if detectVerbose {
-		technologies, err := detector.Detect(cwd)
+		evidence, err := detector.DetectWithEvidence(cwd)
 		if err != nil {
 			return fmt.Errorf("failed to detect technologies: %w", err)
 		}
 
-		rules := detector.GetRules()
 		fmt.Printf("Checking detection rules in %s:\n", cwd)
 
-		techSet := make(map[detect.Technology]bool)
-		for _, tech := range technologies {
-			techSet[tech] = true
-		}
-
-		for _, rule := range rules {
-			if techSet[rule.Technology] {
-				fmt.Printf("✓ %s: %s\n", rule.Technology, rule.Desc)
+		for _, ev := range evidence {
+			if ev.Found {
+				fmt.Printf("✓ %s: %s\n", ev.Technology, ev.FormatEvidence())
 			} else {
-				fmt.Printf("✗ %s: not detected\n", rule.Technology)
+				fmt.Printf("✗ %s: not detected\n", ev.Technology)
 			}
 		}
 		return nil
