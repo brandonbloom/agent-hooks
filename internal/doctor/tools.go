@@ -40,6 +40,7 @@ type ToolCheck struct {
 //     to check for "one of" requirements (e.g., procfile-runner checks for foreman OR hivemind OR overmind)
 var AllTools = []ToolCheck{
 	{Name: "agent-hooks", Command: "agent-hooks", URL: "https://github.com/brandonbloom/agent-hooks"},
+	{Name: "biome", Command: "biome", URL: "https://biomejs.dev"},
 	{Name: "cargo", Command: "cargo", URL: "https://doc.rust-lang.org/cargo/"},
 	{Name: "clojure", Command: "clojure", URL: "https://clojure.org"},
 	{Name: "direnv", Command: "direnv", Validator: validateDirenvSetup, URL: "https://direnv.net"},
@@ -59,6 +60,7 @@ var AllTools = []ToolCheck{
 	{Name: "npm", Command: "npm", URL: "https://www.npmjs.com"},
 	{Name: "overmind", Command: "overmind", URL: "https://github.com/DarthSim/overmind"},
 	{Name: "pip", Command: "pip", URL: "https://pip.pypa.io"},
+	{Name: "prettier", Command: "prettier", URL: "https://prettier.io"},
 	{Name: "procfile-runner", Validator: validateProcfileRunner, URL: "https://devcenter.heroku.com/articles/procfile"},
 	{Name: "python", Command: "python", URL: "https://www.python.org"},
 	{Name: "ruby", Command: "ruby", URL: "https://www.ruby-lang.org"},

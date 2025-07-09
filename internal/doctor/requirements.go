@@ -4,6 +4,12 @@ import (
 	"github.com/brandonbloom/agent-hooks/internal/detect"
 )
 
+// FormattingToolSupport defines which tools can format which file extensions
+type FormattingToolSupport struct {
+	Extensions []string // File extensions this applies to
+	Tools      []string // Available tools in preference order (first = most preferred)
+}
+
 // ToolRequirement represents an association between a technology and a tool.
 // It specifies that when a particular technology is detected in a project,
 // the associated tool should be checked with the given required/optional status.
@@ -60,4 +66,20 @@ func GetToolRequirements(tech detect.Technology) []ToolRequirement {
 		}
 	}
 	return requirements
+}
+
+// Formatting tool support - tools are listed in preference order
+var formattingSupport = []FormattingToolSupport{
+	{
+		Extensions: []string{".go"},
+		Tools:      []string{"goimports", "gofmt"}, // goimports preferred over gofmt
+	},
+	{
+		Extensions: []string{".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"},
+		Tools:      []string{"biome", "prettier"}, // biome preferred over prettier
+	},
+}
+
+func GetFormattingSupport() []FormattingToolSupport {
+	return formattingSupport
 }
