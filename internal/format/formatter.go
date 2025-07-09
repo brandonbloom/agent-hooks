@@ -83,7 +83,7 @@ func canUseFormatter(toolName string, detectedTechs []detect.Technology) bool {
 		// JS/TS tools require configuration detection
 		return containsTechnology(detectedTechs, detect.Biome) && isCommandAvailable(toolName)
 	case "prettier":
-		return containsTechnology(detectedTechs, detect.Prettier) && isCommandAvailable(toolName)
+		return containsTechnology(detectedTechs, detect.Prettier) && isCommandAvailable("npx")
 	default:
 		return false
 	}
@@ -177,8 +177,8 @@ func formatWithBiome(files []string, result *Result, opts Options) error {
 }
 
 func formatWithPrettier(files []string, result *Result, opts Options) error {
-	if !isCommandAvailable("prettier") {
-		return fmt.Errorf("prettier command not found - install with: npm install -g prettier")
+	if !isCommandAvailable("npx") {
+		return fmt.Errorf("npx command not found - install Node.js to get npx")
 	}
 
 	for _, file := range files {
@@ -187,7 +187,7 @@ func formatWithPrettier(files []string, result *Result, opts Options) error {
 			continue
 		}
 
-		cmd := exec.Command("prettier", "--write", file)
+		cmd := exec.Command("npx", "prettier", "--write", file)
 		if err := cmd.Run(); err != nil {
 			return fmt.Errorf("failed to format %s with prettier: %w", file, err)
 		}
