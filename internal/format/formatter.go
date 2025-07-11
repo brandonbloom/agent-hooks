@@ -80,8 +80,8 @@ func canUseFormatter(toolName string, detectedTechs []detect.Technology) bool {
 		// Go tools are always available if the command exists
 		return isCommandAvailable(toolName)
 	case "biome":
-		// JS/TS tools require configuration detection
-		return containsTechnology(detectedTechs, detect.Biome) && isCommandAvailable(toolName)
+		// Biome can format JS/TS files if the command is available globally
+		return isCommandAvailable(toolName)
 	case "prettier":
 		return containsTechnology(detectedTechs, detect.Prettier) && isCommandAvailable("npx")
 	default:
@@ -130,7 +130,7 @@ func (fc *formatterCommand) Run() error {
 	if !isCommandAvailable(fc.command) {
 		return fmt.Errorf(fc.errorMessage)
 	}
-	
+
 	// Execute formatting
 	for _, file := range fc.files {
 		if fc.opts.DryRun {
