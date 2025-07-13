@@ -124,8 +124,14 @@ go build -o agent-hooks main.go
 
 ### Running Tests
 
+Unit tests:
 ```bash
 go test ./...
+```
+
+CLI integration tests use [transcript](https://github.com/deref/transcript):
+```bash
+cd tests && ./run-tests.sh
 ```
 
 ### Local Development

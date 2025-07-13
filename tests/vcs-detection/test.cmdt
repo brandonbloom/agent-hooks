@@ -1,0 +1,9 @@
+$ agent-hooks which-vcs
+2 Error: unsupported or unknown version control system
+? 1
+
+$ git init | sed 's|in .*|in .git/|'
+1 Initialized empty Git repository in .git/
+
+$ agent-hooks which-vcs
+1 git
