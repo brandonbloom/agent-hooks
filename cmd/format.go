@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/brandonbloom/agent-hooks/internal/format"
 	"github.com/brandonbloom/agent-hooks/internal/git"
@@ -60,6 +61,10 @@ Currently requires a Git repository and supports Go files.`,
 			}
 
 			for _, file := range changedFiles {
+				// Skip deleted files - don't try to format files that no longer exist
+				if strings.Contains(file.Status, "D") {
+					continue
+				}
 				filesToFormat = append(filesToFormat, file.Path)
 			}
 		}

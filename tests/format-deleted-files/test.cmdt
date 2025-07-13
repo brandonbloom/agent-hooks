@@ -1,0 +1,37 @@
+# Test that format command skips deleted files
+# This test reproduces the issue where format tries to format deleted files
+
+$ git init | sed 's|in .*|in .git/|'
+1 Initialized empty Git repository in .git/
+
+$ git config user.name "Test User"
+
+$ git config user.email "test@example.com"
+
+# Create a Go file to simulate a file that would be formatted
+$ cat > main.go << 'EOF'
+package main
+
+import "fmt"
+
+func main(){
+fmt.Println("Hello, World!")
+}
+EOF
+
+$ git add main.go
+
+$ git commit -m "Add main.go"
+1 [main (root-commit) ???????] Add main.go
+2  1 file changed, 7 insertions(+)
+3  create mode 100644 main.go
+
+# Remove the file to create a deleted file status
+$ rm main.go
+
+# Verify the file shows as deleted in git status
+$ git status --porcelain
+1  D main.go
+
+# Run format command - it should not fail even though main.go is deleted
+$ agent-hooks format
