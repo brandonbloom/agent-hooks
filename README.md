@@ -15,6 +15,8 @@ AI agents like Claude are powerful but often inconsistent with development workf
 
 This tool was built primarily for personal use but may serve as a useful example for others tackling similar workflow automation challenges.
 
+NOTE: I am aggressively "vibe-coding" this project as a learning experience.
+
 ## Installation
 
 ```bash
