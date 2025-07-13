@@ -1,0 +1,16 @@
+{
+  "name": "VCS Detection - No VCS",
+  "description": "Test that which-vcs returns error when no VCS is detected",
+  "setup": [],
+  "commands": [
+    {
+      "command": "which-vcs",
+      "expectedExit": 1,
+      "expectedOut": "",
+      "expectedErr": "Error: unsupported or unknown version control system"
+    }
+  ],
+  "files": {
+    "README.md": "# Test Directory\n\nThis directory has no version control.\n"
+  }
+}
