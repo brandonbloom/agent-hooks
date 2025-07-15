@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/brandonbloom/agent-hooks/internal/format"
 	"github.com/brandonbloom/agent-hooks/internal/git"
@@ -15,6 +16,24 @@ var (
 	formatVerbose bool
 	dryRun        bool
 )
+
+// resolveFilePaths converts relative paths from Git to absolute paths
+func resolveFilePaths(files []string) ([]string, error) {
+	gitRoot, err := vcs.FindProjectRoot()
+	if err != nil {
+		return nil, fmt.Errorf("failed to find project root: %w", err)
+	}
+
+	resolvedFiles := make([]string, len(files))
+	for i, file := range files {
+		if filepath.IsAbs(file) {
+			resolvedFiles[i] = file
+		} else {
+			resolvedFiles[i] = filepath.Join(gitRoot, file)
+		}
+	}
+	return resolvedFiles, nil
+}
 
 var formatCmd = &cobra.Command{
 	Use:   "format [files...]",
@@ -70,6 +89,13 @@ Currently requires a Git repository and supports Go files.`,
 			}
 			return nil
 		}
+
+		// Resolve relative paths from Git to absolute paths
+		resolvedFiles, err := resolveFilePaths(filesToFormat)
+		if err != nil {
+			return fmt.Errorf("failed to resolve file paths: %w", err)
+		}
+		filesToFormat = resolvedFiles
 
 		opts := format.Options{
 			DryRun:  dryRun,
