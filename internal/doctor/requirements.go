@@ -53,6 +53,7 @@ var toolRequirements = []ToolRequirement{
 	{Technology: detect.Rust, Tool: "rustc", Required: true},
 	{Technology: detect.Svelte, Tool: "node", Required: true},
 	{Technology: detect.Svelte, Tool: "npm", Required: false},
+	{Technology: detect.Swift, Tool: "swift", Required: true},
 	{Technology: detect.Transcript, Tool: "transcript", Required: true},
 	{Technology: detect.Vue, Tool: "node", Required: true},
 	{Technology: detect.Vue, Tool: "npm", Required: false},

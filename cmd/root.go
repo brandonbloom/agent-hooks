@@ -27,6 +27,7 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(aboutCmd)
+	rootCmd.AddCommand(detectCmd)
 	rootCmd.AddCommand(doctorCmd)
 	rootCmd.AddCommand(formatCmd)
 	rootCmd.AddCommand(versionCmd)

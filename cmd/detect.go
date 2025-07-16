@@ -20,7 +20,6 @@ var detectVerbose bool
 
 func init() {
 	detectCmd.Flags().BoolVarP(&detectVerbose, "verbose", "v", false, "Show all detection attempts, not just detected technologies")
-	rootCmd.AddCommand(detectCmd)
 }
 
 func runDetect(cmd *cobra.Command, args []string) error {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/brandonbloom/agent-hooks/internal/detect"
@@ -65,6 +66,7 @@ var AllTools = []ToolCheck{
 	{Name: "python", Command: "python", URL: "https://www.python.org"},
 	{Name: "ruby", Command: "ruby", URL: "https://www.ruby-lang.org"},
 	{Name: "rustc", Command: "rustc", URL: "https://www.rust-lang.org"},
+	{Name: "swift", Command: "swift", Validator: validateSwiftToolchainVersion, URL: "https://swift.org"},
 	{Name: "transcript", Command: "transcript", URL: "https://github.com/jspahrsummers/transcript"},
 }
 
@@ -175,6 +177,7 @@ func getToolVersion(command string) string {
 		"git":         {"--version"},
 		"go":          {"version"},
 		"goimports":   {"--help"},
+		"swift":       {"--version"},
 	}
 
 	args, exists := versionArgs[command]
@@ -202,6 +205,8 @@ func getToolVersion(command string) string {
 				return parts[2]
 			}
 		}
+	case "swift":
+		return getCurrentSwiftVersion()
 	}
 
 	return version
@@ -277,4 +282,118 @@ func CheckForOneToolOf(tech detect.Technology, tools []string, groupName string,
 	}
 
 	return result
+}
+
+func validateSwiftToolchainVersion() error {
+	// Check if we're in a Swift project
+	packageSwiftPath := "Package.swift"
+	if _, err := os.Stat(packageSwiftPath); err != nil {
+		return nil // No Package.swift file, so no version validation needed
+	}
+
+	// Read Package.swift to get required swift-tools-version
+	content, err := os.ReadFile(packageSwiftPath)
+	if err != nil {
+		return fmt.Errorf("failed to read Package.swift: %v", err)
+	}
+
+	// Parse swift-tools-version from Package.swift
+	requiredVersion := parseSwiftToolsVersion(string(content))
+	if requiredVersion == "" {
+		return nil // No swift-tools-version specified, no validation needed
+	}
+
+	// Get current Swift toolchain version
+	currentVersion := getCurrentSwiftVersion()
+	if currentVersion == "" {
+		return fmt.Errorf("failed to get current Swift toolchain version")
+	}
+
+	// Check for version compatibility
+	if !isSwiftVersionCompatible(currentVersion, requiredVersion) {
+		return fmt.Errorf("Swift toolchain version mismatch: Package.swift requires %s, but current toolchain is %s", requiredVersion, currentVersion)
+	}
+
+	return nil
+}
+
+func parseSwiftToolsVersion(content string) string {
+	// Look for swift-tools-version comment at the top of Package.swift
+	// Format: // swift-tools-version:5.9
+	// or: // swift-tools-version: 5.9
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "// swift-tools-version:") {
+			version := strings.TrimSpace(strings.TrimPrefix(line, "// swift-tools-version:"))
+			return version
+		}
+		if strings.HasPrefix(line, "// swift-tools-version: ") {
+			version := strings.TrimSpace(strings.TrimPrefix(line, "// swift-tools-version: "))
+			return version
+		}
+		// Stop at first non-comment line
+		if !strings.HasPrefix(line, "//") && line != "" {
+			break
+		}
+	}
+	return ""
+}
+
+func getCurrentSwiftVersion() string {
+	cmd := exec.Command("swift", "--version")
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+
+	// Parse Swift version from output
+	// Format: "swift-driver version: 1.87.3 Apple Swift version 5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)"
+	// or: "Swift version 5.9.2 (swift-5.9.2-RELEASE)"
+	version := strings.TrimSpace(string(output))
+	
+	// Look for "Swift version X.Y.Z" or "Apple Swift version X.Y.Z"
+	if strings.Contains(version, "Apple Swift version ") {
+		start := strings.Index(version, "Apple Swift version ") + len("Apple Swift version ")
+		end := strings.Index(version[start:], " ")
+		if end != -1 {
+			return version[start : start+end]
+		}
+	}
+	
+	if strings.Contains(version, "Swift version ") {
+		start := strings.Index(version, "Swift version ") + len("Swift version ")
+		end := strings.Index(version[start:], " ")
+		if end != -1 {
+			return version[start : start+end]
+		}
+	}
+	
+	return ""
+}
+
+func isSwiftVersionCompatible(currentVersion, requiredVersion string) bool {
+	// Parse versions for comparison
+	currentMajor, currentMinor := parseSwiftVersion(currentVersion)
+	requiredMajor, requiredMinor := parseSwiftVersion(requiredVersion)
+	
+	// Same major version is required
+	if currentMajor != requiredMajor {
+		return false
+	}
+	
+	// Current minor version must be >= required minor version
+	return currentMinor >= requiredMinor
+}
+
+func parseSwiftVersion(version string) (major, minor int) {
+	// Parse version like "5.9" or "5.9.2"
+	parts := strings.Split(version, ".")
+	if len(parts) < 2 {
+		return 0, 0
+	}
+	
+	major, _ = strconv.Atoi(parts[0])
+	minor, _ = strconv.Atoi(parts[1])
+	return major, minor
 }

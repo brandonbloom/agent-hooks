@@ -51,7 +51,7 @@ var detectionRules = []DetectionRule{
 	{Technology: Shell, Files: []string{"*.sh", "*.bash", "*.zsh", "*.fish"}, Desc: "Shell scripts", URL: "https://en.wikipedia.org/wiki/Unix_shell"},
 	{Technology: SQL, Files: []string{"*.sql"}, Desc: "SQL files", URL: "https://en.wikipedia.org/wiki/SQL"},
 	{Technology: Svelte, Files: []string{"*.svelte", "svelte.config.js", "vite.config.js"}, Desc: "Svelte project", URL: "https://svelte.dev"},
-	{Technology: Swift, Files: []string{"*.swift"}, Desc: "Swift source files", URL: "https://swift.org"},
+	{Technology: Swift, Files: []string{"*.swift", "Package.swift"}, Desc: "Swift source files or Swift Package", URL: "https://swift.org"},
 	{Technology: TOML, Files: []string{"*.toml"}, Desc: "TOML files", URL: "https://toml.io"},
 	{Technology: Transcript, Files: []string{"*.cmdt"}, Desc: "Transcript test files", URL: "https://github.com/brandonbloom/transcript"},
 	{Technology: TypeScript, Files: []string{"*.ts", "*.dts"}, Desc: "TypeScript source files", URL: "https://www.typescriptlang.org"},
