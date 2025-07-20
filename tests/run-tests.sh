@@ -30,8 +30,8 @@ while IFS= read -r test_file; do
     # Create temp directory for this test
     TEMP_DIR=$(mktemp -d)
     
-    # Copy all files from the test directory to temp directory
-    cp -r "$test_dir"/* "$TEMP_DIR/"
+    # Copy all files from the test directory to temp directory (including hidden files)
+    cp -r "$test_dir"/. "$TEMP_DIR/"
     
     # Run the test with transcript in the temp directory
     if cd "$TEMP_DIR" && PATH="$PROJECT_ROOT:$PATH" go run github.com/deref/transcript@latest check test.cmdt &> /dev/null; then

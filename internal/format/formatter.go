@@ -63,8 +63,11 @@ func FormatFilesWithOptions(files []string, opts Options) *Result {
 }
 
 func formatFilesBySupport(files []string, support doctor.FormattingToolSupport, detectedTechs []detect.Technology, result *Result, opts Options) error {
-	// Find the first available tool from the preference-ordered list
-	for _, toolName := range support.Tools {
+	// Get project-aware tool preference
+	preferredTools := getProjectAwareToolPreference(support.Tools, detectedTechs)
+
+	// Find the first available tool from the project-aware preference list
+	for _, toolName := range preferredTools {
 		if canUseFormatter(toolName, detectedTechs) {
 			return formatWithTool(toolName, files, result, opts)
 		}
@@ -96,6 +99,44 @@ func containsTechnology(techs []detect.Technology, target detect.Technology) boo
 		}
 	}
 	return false
+}
+
+// getProjectAwareToolPreference reorders tools based on project configuration.
+// If exactly one tool has project config, it gets priority.
+// Otherwise, use the original preference order.
+func getProjectAwareToolPreference(tools []string, detectedTechs []detect.Technology) []string {
+	var configuredTools []string
+	var unconfiguredTools []string
+
+	for _, tool := range tools {
+		hasConfig := false
+		switch tool {
+		case "prettier":
+			hasConfig = containsTechnology(detectedTechs, detect.Prettier)
+		case "biome":
+			hasConfig = containsTechnology(detectedTechs, detect.Biome)
+		default:
+			// Unknown tool, treat as unconfigured
+			hasConfig = false
+		}
+
+		if hasConfig {
+			configuredTools = append(configuredTools, tool)
+		} else {
+			unconfiguredTools = append(unconfiguredTools, tool)
+		}
+	}
+
+	// If exactly one tool is configured, prefer it
+	if len(configuredTools) == 1 {
+		result := make([]string, 0, len(tools))
+		result = append(result, configuredTools...)
+		result = append(result, unconfiguredTools...)
+		return result
+	}
+
+	// If zero or multiple tools configured, use original order
+	return tools
 }
 
 func formatWithTool(toolName string, files []string, result *Result, opts Options) error {

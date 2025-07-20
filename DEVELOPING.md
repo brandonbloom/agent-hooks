@@ -266,6 +266,7 @@ This is a personal tool, but contributions are welcome:
 3. Add appropriate error handling and user-friendly messages
 4. Test both success and failure scenarios
 5. Update documentation for new features
+6. **All new features must include test cases** - either unit tests or integration tests using the transcript framework
 
 ## Claude Code Integration
 

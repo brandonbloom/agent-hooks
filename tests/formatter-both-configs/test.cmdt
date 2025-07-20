@@ -1,0 +1,14 @@
+# Test: Both configs present - should use biome (original preference order)
+
+# Setup git repo
+$ rm -rf .git
+$ git init | sed 's|in .*|in .git/|'
+1 Initialized empty Git repository in .git/
+
+$ cp unformatted.js test.js
+$ git add test.js .prettierrc biome.json
+$ agent-hooks format --verbose test.js
+1 Formatted: test.js
+
+# Cleanup
+$ rm -f test.js
