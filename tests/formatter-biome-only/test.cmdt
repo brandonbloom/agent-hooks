@@ -1,12 +1,8 @@
 # Test: Only biome config - should use biome
 
-# Setup git repo
-$ rm -rf .git
-$ git init | sed 's|in .*|in .git/|'
-1 Initialized empty Git repository in .git/
-
 $ cp unformatted.js test.js
-$ git add test.js biome.json
+$ setup_git_repo
+1 Initialized empty Git repository in .git/
 $ agent-hooks format --verbose test.js
 1 Formatted: test.js
 

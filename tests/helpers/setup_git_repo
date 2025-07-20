@@ -1,0 +1,5 @@
+#!/bin/bash
+# Initialize git repo and stage all files for agent-hooks tests
+
+git init | sed 's|in .*|in .git/|'
+git add .

@@ -34,14 +34,14 @@ while IFS= read -r test_file; do
     cp -r "$test_dir"/. "$TEMP_DIR/"
     
     # Run the test with transcript in the temp directory
-    if cd "$TEMP_DIR" && PATH="$PROJECT_ROOT:$PATH" go run github.com/deref/transcript@latest check test.cmdt &> /dev/null; then
+    if cd "$TEMP_DIR" && PATH="$PROJECT_ROOT:$SCRIPT_DIR/helpers:$PATH" go run github.com/deref/transcript@latest check test.cmdt &> /dev/null; then
         echo -e "${GREEN}PASS${NC}"
         ((PASSED++))
     else
         echo -e "${RED}FAIL${NC}"
         ((FAILED++))
         # Show the failure details
-        cd "$TEMP_DIR" && PATH="$PROJECT_ROOT:$PATH" go run github.com/deref/transcript@latest check test.cmdt 2>&1 | sed 's/^/    /'
+        cd "$TEMP_DIR" && PATH="$PROJECT_ROOT:$SCRIPT_DIR/helpers:$PATH" go run github.com/deref/transcript@latest check test.cmdt 2>&1 | sed 's/^/    /'
     fi
     
     # Clean up temp directory
