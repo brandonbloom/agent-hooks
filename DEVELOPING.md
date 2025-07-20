@@ -282,3 +282,24 @@ When developing for Claude Code integration:
 - Ensure hook failures don't break Claude Code workflows
 - Consider timing implications for large codebases
 - Document expected hook behavior clearly
+
+### Hook vs Manual Execution Detection
+
+Agent-hooks can distinguish between automatic execution (via Claude Code hooks) and manual invocation:
+
+- The `post-tool-use` command checks the `.agenthooks` config file `disable: true` setting and only affects hook execution
+- Manual invocation (`agent-hooks format` in terminal) ignores the disable setting
+- This allows disabling automatic hooks while preserving manual control
+
+#### Testing Hook Behavior
+
+```bash
+# Test manual execution (always works regardless of .agenthooks config)
+go run main.go format
+
+# Test hook execution (respects .agenthooks disable setting)
+go run main.go post-tool-use
+
+# For development: keep .agenthooks with disable: true to avoid triggering
+# during iteration, but still allow manual testing
+```

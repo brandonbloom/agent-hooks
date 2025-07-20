@@ -104,7 +104,7 @@ func checkClaudeHookConfiguration(settingsPath string, verbose bool) CheckResult
 
 	for _, hook := range settings.Hooks.PostToolUse {
 		for _, config := range hook.Hooks {
-			if strings.Contains(config.Command, "agent-hooks format") {
+			if strings.Contains(config.Command, "agent-hooks post-tool-use") {
 				agentHooksFound = true
 				if strings.Contains(hook.Matcher, "Write") &&
 					strings.Contains(hook.Matcher, "Edit") &&

@@ -29,6 +29,7 @@ func init() {
 	rootCmd.AddCommand(aboutCmd)
 	rootCmd.AddCommand(doctorCmd)
 	rootCmd.AddCommand(formatCmd)
+	rootCmd.AddCommand(postToolUseCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(whichVcsCmd)
 }

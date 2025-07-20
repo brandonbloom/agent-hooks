@@ -1,0 +1,37 @@
+# Test project-aware formatter preference logic
+
+# Setup git repo
+$ rm -rf .git
+$ git init | sed 's|in .*|in .git/|'
+1 Initialized empty Git repository in .git/
+
+# Test 1: No config files - should use biome (default preference)
+$ cp unformatted.js test1.js
+$ git add test1.js
+$ agent-hooks format --verbose test1.js
+1 Formatted: test1.js
+
+# Test 2: Only prettier config - should prefer prettier
+$ cp unformatted.js test2.js
+$ cp .prettierrc prettier-only.prettierrc
+$ git add test2.js prettier-only.prettierrc
+$ agent-hooks format --verbose test2.js
+1 Formatted: test2.js
+
+# Test 3: Only biome config - should use biome
+$ rm prettier-only.prettierrc
+$ cp unformatted.js test3.js  
+$ cp biome.json biome-only.json
+$ git add test3.js biome-only.json
+$ agent-hooks format --verbose test3.js
+1 Formatted: test3.js
+
+# Test 4: Both configs present - should use biome (original preference order)
+$ cp .prettierrc both-configs.prettierrc
+$ cp unformatted.js test4.js
+$ git add test4.js both-configs.prettierrc
+$ agent-hooks format --verbose test4.js
+1 Formatted: test4.js
+
+# Cleanup
+$ rm -f test*.js *-only.* both-configs.*

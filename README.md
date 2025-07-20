@@ -43,6 +43,13 @@ agent-hooks format --dry-run         # Preview what would be formatted
 agent-hooks format --dry-run -v      # Preview with detailed output
 ```
 
+### `post-tool-use`
+Hook command for Claude Code PostToolUse events. Checks `.agenthooks` configuration and only runs formatting if hooks are not disabled. Use this command in Claude Code hooks instead of calling `format` directly.
+
+```bash
+agent-hooks post-tool-use             # For use in Claude Code hooks
+```
+
 ### `doctor`
 Checks development environment and Claude Code setup. Silent by default, shows all checks with `--verbose`.
 
@@ -64,7 +71,7 @@ Automatically format code after file modifications by adding this to `~/.claude/
         "hooks": [
           {
             "type": "command",
-            "command": "agent-hooks format"
+            "command": "agent-hooks post-tool-use"
           }
         ]
       }
@@ -72,6 +79,20 @@ Automatically format code after file modifications by adding this to `~/.claude/
   }
 }
 ```
+
+## Configuration
+
+### Disabling Hook Execution
+
+You can disable automatic execution of agent-hooks when running as Claude Code hooks by creating a `.agenthooks` configuration file in your project root:
+
+```yaml
+disable: true
+```
+
+This setting only affects automatic execution via Claude Code hooks (when using `agent-hooks post-tool-use`). Manual invocation (running `agent-hooks format` directly in the terminal) will still work normally.
+
+The configuration file is searched in the current directory and parent directories, allowing you to disable hooks at the project level or higher in the directory hierarchy.
 
 ## Contributing
 
