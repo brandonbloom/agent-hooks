@@ -87,6 +87,8 @@ The `internal/format` package provides the extensible formatting system:
 - **Graceful degradation**: Warns about unsupported files instead of failing
 - **Dry-run support**: Preview mode that shows what would be formatted without changes
 - **Verbose output**: Detailed reporting of formatting operations and skipped files
+- **Intelligent tool selection**: Project-aware preferences based on configuration files
+- **Multi-language support**: Including Go, JavaScript, TypeScript, and more
 
 ### Diagnostics System
 
@@ -267,6 +269,7 @@ This is a personal tool, but contributions are welcome:
 4. Test both success and failure scenarios
 5. Update documentation for new features
 6. **All new features must include test cases** - either unit tests or integration tests using the transcript framework
+7. **Document user-facing features in README.md** - new commands, formatting support, or significant behavior changes must be documented with examples
 
 ## Claude Code Integration
 

@@ -33,7 +33,7 @@ agent-hooks which-vcs
 ```
 
 ### `format`
-Formats changed files (or all files with `--all-files`). Supports Go files.
+Formats changed files (or all files with `--all-files`). Supports multiple languages and automatically selects the best formatter based on your project configuration.
 
 ```bash
 agent-hooks format                    # Format changed files only
@@ -48,6 +48,22 @@ Hook command for Claude Code PostToolUse events. Checks `.agenthooks` configurat
 
 ```bash
 agent-hooks post-tool-use             # For use in Claude Code hooks
+```
+
+### `detect`
+Identifies technologies and frameworks used in your project.
+
+```bash
+agent-hooks detect              # List all detected technologies
+```
+
+### `about`
+Shows detailed information about specific technologies or tools.
+
+```bash
+agent-hooks about go           # Information about Go technology
+agent-hooks about html         # Information about HTML technology
+agent-hooks about goimports    # Information about goimports tool
 ```
 
 ### `doctor`
